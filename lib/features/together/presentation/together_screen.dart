@@ -655,16 +655,6 @@ class _SheetFrame extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Center(
-            child: Container(
-              width: 36,
-              height: 4,
-              decoration: BoxDecoration(
-                  color: c.hairline,
-                  borderRadius: BorderRadius.circular(AppRadii.pill)),
-            ),
-          ),
-          const SizedBox(height: AppSpacing.xl),
           Text(title, style: AppType.title.copyWith(color: c.ink, fontSize: 21)),
           const SizedBox(height: AppSpacing.lg),
           child,
