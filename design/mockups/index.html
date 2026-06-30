@@ -1,0 +1,427 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Teduh — Mockup</title>
+<style>
+:root{
+  /* Pagi (default) */
+  --bg: oklch(0.968 0.013 83);
+  --surface: oklch(0.992 0.008 83);
+  --sunken: oklch(0.945 0.016 80);
+  --ink: oklch(0.265 0.018 50);
+  --ink2: oklch(0.460 0.020 55);
+  --muted: oklch(0.605 0.018 60);
+  --hairline: oklch(0.900 0.015 80);
+  --accent: oklch(0.560 0.130 42);
+  --accent-press: oklch(0.500 0.130 42);
+  --wash: oklch(0.945 0.030 50);
+  --on-accent: oklch(0.985 0.010 83);
+  --gold: oklch(0.740 0.110 78);
+  --red: oklch(0.500 0.150 26);
+  --success: oklch(0.580 0.100 150);
+  --e1: 0 1px 2px oklch(0.4 0.03 60 / .06), 0 1px 1px oklch(0.4 0.03 60 / .04);
+  --e2: 0 10px 34px oklch(0.35 0.03 60 / .16), 0 2px 6px oklch(0.35 0.03 60 / .08);
+  --serif:"Iowan Old Style","Charter","Palatino Linotype",Palatino,Georgia,serif;
+  --sans:-apple-system,BlinkMacSystemFont,"Helvetica Neue","Segoe UI",system-ui,sans-serif;
+}
+[data-theme="senja"]{
+  --bg: oklch(0.910 0.030 75); --surface: oklch(0.935 0.026 75); --sunken: oklch(0.880 0.034 72);
+  --ink: oklch(0.320 0.030 48); --ink2: oklch(0.480 0.030 52); --muted: oklch(0.600 0.028 58);
+  --hairline: oklch(0.840 0.030 70); --accent: oklch(0.520 0.130 40); --accent-press: oklch(0.46 0.13 40);
+  --wash: oklch(0.880 0.040 50); --on-accent: oklch(0.975 0.01 80);
+  --gold: oklch(0.700 0.110 76); --red: oklch(0.470 0.150 26); --success: oklch(0.540 0.100 150);
+}
+[data-theme="malam"]{
+  --bg: oklch(0.205 0.012 60); --surface: oklch(0.245 0.013 60); --sunken: oklch(0.175 0.010 60);
+  --ink: oklch(0.900 0.014 84); --ink2: oklch(0.700 0.014 70); --muted: oklch(0.560 0.014 64);
+  --hairline: oklch(0.320 0.012 60); --accent: oklch(0.700 0.110 46); --accent-press: oklch(0.640 0.110 46);
+  --wash: oklch(0.290 0.030 50); --on-accent: oklch(0.190 0.010 60);
+  --gold: oklch(0.780 0.100 80); --red: oklch(0.680 0.130 30); --success: oklch(0.680 0.090 152);
+  --e1: 0 0 0 1px oklch(0.32 0.012 60); --e2: 0 12px 40px oklch(0 0 0 / .5);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
+body{background:oklch(0.27 0.018 55);font-family:var(--sans);color:var(--ink)}
+.board{display:flex;flex-direction:column;align-items:center;gap:14px;padding:64px 0 96px}
+.board-title{font-family:var(--serif);color:oklch(0.95 0.02 80);font-size:30px;font-weight:500;letter-spacing:.01em}
+.board-sub{color:oklch(0.78 0.015 70);font-size:14px;margin-bottom:34px}
+.stage{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:40px 0;scroll-snap-align:start}
+.caption{color:oklch(0.84 0.012 70);font-size:15px;font-weight:500;letter-spacing:.01em;display:flex;gap:10px;align-items:baseline}
+.caption b{color:oklch(0.97 0.02 80);font-weight:600}
+.caption span{color:oklch(0.68 0.012 70);font-weight:400;font-size:13.5px}
+
+/* phone */
+.phone{width:400px;height:858px;background:var(--bg);border-radius:46px;position:relative;overflow:hidden;
+  box-shadow:0 0 0 11px oklch(0.16 0.01 55),0 0 0 13px oklch(0.30 0.012 55),0 40px 90px oklch(0 0 0 / .5);
+  color:var(--ink);display:flex;flex-direction:column}
+.statusbar{height:52px;flex:0 0 52px;display:flex;align-items:center;justify-content:space-between;padding:0 30px 0 34px;font-size:15px;font-weight:600;color:var(--ink)}
+.statusbar .ic{display:flex;gap:6px;align-items:center}
+.notch{position:absolute;top:14px;left:50%;transform:translateX(-50%);width:118px;height:30px;background:oklch(0.16 0.01 55);border-radius:18px;z-index:20}
+
+/* generic ui */
+.appbar{height:56px;flex:0 0 56px;display:flex;align-items:center;justify-content:space-between;padding:0 18px;gap:8px}
+.appbar .title{font-family:var(--serif);font-size:20px;font-weight:500}
+.iconbtn{width:42px;height:42px;border-radius:999px;display:flex;align-items:center;justify-content:center;color:var(--ink2)}
+.iconbtn:active{background:var(--sunken)}
+svg{display:block}
+.body{flex:1;overflow:hidden;position:relative}
+.pad{padding:6px 22px 22px}
+
+.btn{height:54px;border-radius:999px;background:var(--accent);color:var(--on-accent);font-family:var(--sans);
+  font-size:16px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:9px;width:100%;border:none;letter-spacing:.01em}
+.btn.ghost{background:transparent;color:var(--accent);box-shadow:inset 0 0 0 1.5px var(--accent)}
+.overline{font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.cap{font-size:13px;color:var(--muted)}
+
+/* bottom nav */
+.nav{height:78px;flex:0 0 78px;border-top:1px solid var(--hairline);background:var(--surface);display:flex;align-items:flex-start;padding:10px 8px 0;justify-content:space-around}
+.nav a{display:flex;flex-direction:column;align-items:center;gap:5px;color:var(--muted);font-size:11px;font-weight:500;width:74px}
+.nav a.on{color:var(--accent)}
+
+/* HOME */
+.greet{font-family:var(--serif);font-size:30px;font-weight:500;line-height:1.15;margin-top:6px}
+.todaycard{background:var(--surface);border-radius:20px;padding:22px 22px 20px;box-shadow:var(--e1);margin-top:18px;position:relative;overflow:hidden}
+.todaycard .ttl{font-family:var(--serif);font-size:32px;font-weight:500;margin:8px 0 4px;letter-spacing:.005em}
+.todaycard .meta{font-size:14px;color:var(--ink2);margin-bottom:20px}
+.ribbon{position:absolute;top:0;right:26px;width:26px;height:54px;background:var(--accent);border-radius:0 0 5px 5px;clip-path:polygon(0 0,100% 0,100% 100%,50% 84%,0 100%)}
+.streak{display:flex;align-items:center;gap:14px;margin-top:20px;background:var(--surface);border-radius:18px;padding:16px 18px;box-shadow:var(--e1)}
+.flame{width:46px;height:46px;border-radius:999px;background:var(--wash);display:flex;align-items:center;justify-content:center;flex:0 0 46px}
+.streak .n{font-family:var(--serif);font-size:24px;font-weight:600;line-height:1}
+.week{display:flex;gap:8px;margin-left:auto}
+.day{display:flex;flex-direction:column;align-items:center;gap:6px;font-size:10.5px;color:var(--muted);font-weight:500}
+.dot{width:24px;height:24px;border-radius:999px;background:var(--sunken);display:flex;align-items:center;justify-content:center}
+.dot.done{background:var(--success);color:var(--on-accent)}
+.dot.today{box-shadow:inset 0 0 0 2px var(--accent);background:var(--wash)}
+.together{margin-top:18px;border:1.5px dashed var(--hairline);border-radius:18px;padding:16px 18px;display:flex;gap:14px;align-items:center}
+.together .ic{width:42px;height:42px;border-radius:12px;background:var(--sunken);display:flex;align-items:center;justify-content:center;flex:0 0 42px;color:var(--accent)}
+.together .t{font-size:14.5px;font-weight:600}
+.together .s{font-size:12.5px;color:var(--muted);margin-top:2px;line-height:1.4}
+.soon{font-size:10.5px;font-weight:600;color:var(--accent);background:var(--wash);padding:3px 9px;border-radius:999px;letter-spacing:.04em;margin-left:auto;align-self:flex-start;white-space:nowrap}
+
+/* READER */
+.reader{height:100%;display:flex;flex-direction:column}
+.r-appbar{height:56px;flex:0 0 56px;display:flex;align-items:center;justify-content:space-between;padding:0 12px}
+.r-title{display:flex;flex-direction:column;align-items:center;line-height:1.1}
+.r-title b{font-family:var(--serif);font-size:18px;font-weight:600}
+.r-title span{font-size:11px;color:var(--muted);letter-spacing:.02em}
+.scroll{flex:1;overflow:hidden;padding:8px 24px 0;position:relative}
+.chapno{text-align:center;margin:14px 0 18px}
+.chapno .num{font-family:var(--serif);font-size:64px;font-weight:500;color:var(--accent);line-height:.9}
+.chapno .lbl{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-top:8px}
+.scripture{font-family:var(--serif);font-size:19.5px;line-height:1.74;font-weight:400;color:var(--ink);text-align:left}
+.scripture .vn{font-family:var(--sans);font-size:11px;font-weight:600;color:var(--muted);vertical-align:.42em;margin-right:3px;margin-left:1px}
+.scripture .rl{color:var(--red)}
+.section-head{font-family:var(--serif);font-style:italic;font-size:17px;color:var(--ink2);margin:6px 0 10px}
+.fade{position:absolute;left:0;right:0;bottom:0;height:64px;background:linear-gradient(to bottom,transparent,var(--bg))}
+.r-foot{flex:0 0 76px;border-top:1px solid var(--hairline);display:flex;align-items:center;gap:12px;padding:0 16px;background:var(--surface)}
+.chip{height:44px;border-radius:999px;display:flex;align-items:center;justify-content:center;gap:6px;font-size:13px;font-weight:500;color:var(--ink2);padding:0 14px;background:var(--sunken)}
+.markbtn{flex:1;height:50px;border-radius:999px;background:var(--accent);color:var(--on-accent);font-weight:600;font-size:15px;display:flex;align-items:center;justify-content:center;gap:8px}
+
+/* sheet */
+.dim{position:absolute;inset:0;background:oklch(0.2 0.02 55 / .42);z-index:30}
+.sheet{position:absolute;left:0;right:0;bottom:0;background:var(--surface);border-radius:26px 26px 0 0;z-index:31;box-shadow:var(--e2);padding:10px 22px 30px}
+.handle{width:42px;height:5px;border-radius:999px;background:var(--hairline);margin:6px auto 16px}
+.sheet h3{font-family:var(--serif);font-size:20px;font-weight:600;margin-bottom:18px}
+.seg{display:flex;background:var(--sunken);border-radius:14px;padding:5px;gap:4px;margin-bottom:22px}
+.seg div{flex:1;height:48px;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:12px;font-weight:600;color:var(--ink2)}
+.seg div.on{background:var(--surface);color:var(--accent);box-shadow:var(--e1)}
+.row{display:flex;align-items:center;justify-content:space-between;padding:16px 0;border-top:1px solid var(--hairline)}
+.row .lab{font-size:15px;font-weight:500}
+.stepper{display:flex;align-items:center;gap:0;background:var(--sunken);border-radius:999px}
+.stepper button{width:40px;height:40px;border:none;background:transparent;color:var(--accent);font-size:20px;font-weight:600}
+.stepper .v{font-family:var(--serif);font-size:17px;min-width:42px;text-align:center;font-weight:600}
+.switch{width:50px;height:30px;border-radius:999px;background:var(--accent);position:relative}
+.switch::after{content:"";position:absolute;top:3px;right:3px;width:24px;height:24px;border-radius:999px;background:var(--on-accent)}
+.switch.off{background:var(--sunken)}
+.switch.off::after{right:auto;left:3px;background:var(--surface);box-shadow:var(--e1)}
+
+/* LIBRARY */
+.tabs{display:flex;gap:8px;padding:4px 22px 14px}
+.tab{flex:1;height:42px;border-radius:999px;display:flex;align-items:center;justify-content:center;font-size:13.5px;font-weight:600;background:var(--sunken);color:var(--ink2)}
+.tab.on{background:var(--accent);color:var(--on-accent)}
+.note{margin:0 22px 8px;background:var(--wash);border-radius:12px;padding:11px 14px;font-size:12.5px;color:var(--ink2);line-height:1.45;display:flex;gap:9px}
+.note svg{flex:0 0 auto;margin-top:1px;color:var(--accent)}
+.booklist{padding:2px 10px 0}
+.book{display:flex;align-items:center;gap:14px;padding:15px 12px;border-radius:14px}
+.book:active{background:var(--sunken)}
+.book .bn{width:40px;height:40px;border-radius:11px;background:var(--wash);color:var(--accent);font-family:var(--serif);font-weight:600;font-size:17px;display:flex;align-items:center;justify-content:center;flex:0 0 40px}
+.book .nm{font-size:16px;font-weight:500}
+.book .ct{font-size:12.5px;color:var(--muted);margin-top:1px}
+.book .chev{margin-left:auto;color:var(--muted)}
+.book.soon{opacity:.55}
+.book.soon .bn{background:var(--sunken);color:var(--muted)}
+.tag-soon{margin-left:auto;font-size:10.5px;font-weight:600;color:var(--muted);background:var(--sunken);padding:4px 10px;border-radius:999px;letter-spacing:.03em}
+
+/* PLAN */
+.plan-intro{font-family:var(--serif);font-size:22px;font-weight:500;line-height:1.3;margin:8px 0 4px}
+.plan-sub{font-size:14px;color:var(--ink2);margin-bottom:22px;line-height:1.45}
+.field{background:var(--surface);border-radius:16px;box-shadow:var(--e1);margin-bottom:14px;padding:6px 18px}
+.field .fr{display:flex;align-items:center;justify-content:space-between;padding:14px 0}
+.field .fr .l{font-size:13px;color:var(--muted);font-weight:500}
+.field .fr .r{font-family:var(--serif);font-size:18px;font-weight:600;display:flex;align-items:center;gap:8px}
+.estimate{background:var(--wash);border-radius:16px;padding:18px;margin:6px 0 16px}
+.estimate .big{font-family:var(--serif);font-size:19px;font-weight:600;line-height:1.3}
+.estimate .big em{color:var(--accent);font-style:normal}
+.sched{margin-bottom:4px}
+.sched .s{display:flex;align-items:center;gap:14px;padding:13px 4px;border-bottom:1px solid var(--hairline);font-size:15px}
+.sched .s .d{font-size:11px;font-weight:600;color:var(--muted);width:54px;letter-spacing:.04em}
+.sched .s .p{font-family:var(--serif);font-weight:500}
+.sched .s.first .p{color:var(--accent)}
+</style>
+</head>
+<body>
+<div class="board">
+  <div class="board-title">Teduh</div>
+  <div class="board-sub">Pembaca Alkitab — desain hangat &amp; khusyuk · Bahasa Indonesia</div>
+
+  <!-- ============ HOME ============ -->
+  <div class="stage" id="home">
+    <div class="caption"><b>1 · Beranda</b><span>bacaan hari ini, streak, ajakan baca bersama (segera)</span></div>
+    <div class="phone" data-theme="pagi">
+      <div class="notch"></div>
+      <div class="statusbar"><span>7:24</span><span class="ic">
+        <svg width="18" height="12" viewBox="0 0 18 12" fill="currentColor"><rect x="0" y="7" width="3" height="5" rx="1"/><rect x="5" y="4" width="3" height="8" rx="1"/><rect x="10" y="2" width="3" height="10" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1" opacity=".35"/></svg>
+        <svg width="17" height="12" viewBox="0 0 17 12" fill="currentColor"><path d="M8.5 2.5c2.3 0 4.4.9 6 2.4l-1.4 1.4a6.6 6.6 0 0 0-9.2 0L2.5 4.9A8.5 8.5 0 0 1 8.5 2.5Zm0 4c1.2 0 2.3.5 3.1 1.3l-3.1 3.1-3.1-3.1A4.4 4.4 0 0 1 8.5 6.5Z"/></svg>
+        <svg width="26" height="13" viewBox="0 0 26 13" fill="none"><rect x="1" y="1" width="21" height="11" rx="3" stroke="currentColor" stroke-width="1.2" opacity=".5"/><rect x="3" y="3" width="15" height="7" rx="1.5" fill="currentColor"/><rect x="23.5" y="4" width="1.8" height="5" rx="1" fill="currentColor" opacity=".5"/></svg>
+      </span></div>
+      <div class="appbar">
+        <div style="font-family:var(--serif);font-size:22px;font-weight:600;padding-left:8px;letter-spacing:.01em">Teduh</div>
+        <div class="iconbtn"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/></svg></div>
+      </div>
+      <div class="body"><div class="pad">
+        <div class="overline">Senin · 29 Juni</div>
+        <div class="greet">Selamat pagi,<br>David.</div>
+
+        <div class="todaycard">
+          <div class="ribbon"></div>
+          <div class="overline">Bacaan hari ini</div>
+          <div class="ttl">Matius 5–7</div>
+          <div class="meta">Khotbah di Bukit · 3 pasal · ± 11 menit</div>
+          <button class="btn"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 4.5A2.5 2.5 0 0 1 4.5 2H11v18H4.5A2.5 2.5 0 0 0 2 22V4.5Z"/><path d="M22 4.5A2.5 2.5 0 0 0 19.5 2H13v18h6.5a2.5 2.5 0 0 1 2.5 2.5V4.5Z"/></svg>Mulai baca</button>
+        </div>
+
+        <div class="streak">
+          <div class="flame"><svg width="24" height="24" viewBox="0 0 24 24" fill="var(--gold)"><path d="M12 2c.5 3-1.5 4.5-3 6.5C7.4 10.6 6 12.4 6 15a6 6 0 0 0 12 0c0-2-1-3.7-2-5 .2 1.2-.3 2.3-1.3 2.8.6-2.2-.4-4.6-2-6.1C11.3 5.4 11 3.4 12 2Z"/></svg></div>
+          <div>
+            <div class="n">12 hari</div>
+            <div class="cap">berturut-turut</div>
+          </div>
+          <div class="week">
+            <div class="day">Rb<div class="dot done"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4"><path d="M5 12l4 4L19 6"/></svg></div></div>
+            <div class="day">Km<div class="dot done"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4"><path d="M5 12l4 4L19 6"/></svg></div></div>
+            <div class="day">Jm<div class="dot done"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4"><path d="M5 12l4 4L19 6"/></svg></div></div>
+            <div class="day">Sb<div class="dot today"></div></div>
+          </div>
+        </div>
+
+        <div class="together">
+          <div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><circle cx="17.5" cy="9" r="2.4" opacity=".6"/><path d="M16 14.4c2.7.4 4.8 2.7 4.8 5.6" opacity=".6"/></svg></div>
+          <div>
+            <div class="t">Baca bersama</div>
+            <div class="s">Ajak keluarga &amp; sahabat membaca seiring tiap hari.</div>
+          </div>
+          <div class="soon">Segera</div>
+        </div>
+      </div></div>
+      <div class="nav">
+        <a class="on"><svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V20h14V9.5"/></svg>Beranda</a>
+        <a><svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 5.5A2 2 0 0 1 5 4h6v16H5a2 2 0 0 0-2 1.5V5.5Z"/><path d="M21 5.5A2 2 0 0 0 19 4h-6v16h6a2 2 0 0 1 2 1.5V5.5Z"/></svg>Baca</a>
+        <a><svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="5" width="18" height="16" rx="2.5"/><path d="M3 9h18M8 3v4M16 3v4"/></svg>Rencana</a>
+        <a><svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/></svg>Pengaturan</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ READER PAGI ============ -->
+  <div class="stage" id="reader">
+    <div class="caption"><b>2 · Pembaca (Pagi)</b><span>serif di atas kertas hangat · nomor ayat · perkataan Yesus merah</span></div>
+    <div class="phone" data-theme="pagi">
+      <div class="notch"></div>
+      <div class="statusbar"><span>7:31</span><span class="ic">
+        <svg width="18" height="12" viewBox="0 0 18 12" fill="currentColor"><rect x="0" y="7" width="3" height="5" rx="1"/><rect x="5" y="4" width="3" height="8" rx="1"/><rect x="10" y="2" width="3" height="10" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1" opacity=".35"/></svg>
+        <svg width="26" height="13" viewBox="0 0 26 13" fill="none"><rect x="1" y="1" width="21" height="11" rx="3" stroke="currentColor" stroke-width="1.2" opacity=".5"/><rect x="3" y="3" width="15" height="7" rx="1.5" fill="currentColor"/></svg>
+      </span></div>
+      <div class="reader">
+        <div class="r-appbar">
+          <div class="iconbtn"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M15 6l-6 6 6 6"/></svg></div>
+          <div class="r-title"><b>Matius 5</b><span>Khotbah di Bukit</span></div>
+          <div style="display:flex">
+            <div class="iconbtn" style="font-family:var(--serif);font-weight:600"><span style="font-size:13px">A</span><span style="font-size:19px">A</span></div>
+            <div class="iconbtn"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1Z"/></svg></div>
+          </div>
+        </div>
+        <div class="scroll">
+          <div class="chapno"><div class="num">5</div><div class="lbl">Pasal</div></div>
+          <div class="section-head">Ucapan Bahagia</div>
+          <p class="scripture">
+            <span class="vn">1</span>Waktu Yesus melihat orang banyak itu, naiklah Dia ke atas bukit dan duduk di situ. Murid-murid-Nya pun datang kepada-Nya. <span class="vn">2</span>Lalu Yesus mulai mengajar mereka, kata-Nya:
+            <span class="rl"><span class="vn">3</span>“Sungguh diberkati orang yang menyadari bahwa dirinya miskin di hadapan Allah, karena merekalah yang menjadi warga Kerajaan Surga. <span class="vn">4</span>Sungguh diberkati orang yang berdukacita, karena Allah akan menghibur mereka. <span class="vn">5</span>Sungguh diberkati orang yang rendah hati, karena merekalah yang akan mewarisi bumi ini. <span class="vn">6</span>Sungguh diberkati orang yang lapar dan haus untuk melakukan kehendak Allah, karena mereka akan dipuaskan. <span class="vn">7</span>Sungguh diberkati orang yang berbelas kasihan, karena mereka pun akan menerima belas kasihan.”</span>
+          </p>
+          <div class="fade"></div>
+        </div>
+        <div class="r-foot">
+          <div class="chip"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 6l-6 6 6 6"/></svg></div>
+          <div class="markbtn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12l4 4L19 6"/></svg>Tandai selesai</div>
+          <div class="chip"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ READER MALAM ============ -->
+  <div class="stage" id="malam">
+    <div class="caption"><b>3 · Pembaca (Malam)</b><span>tema malam hangat — bukan hitam pekat — untuk baca sebelum tidur</span></div>
+    <div class="phone" data-theme="malam">
+      <div class="notch"></div>
+      <div class="statusbar"><span>22:08</span><span class="ic">
+        <svg width="18" height="12" viewBox="0 0 18 12" fill="currentColor"><rect x="0" y="7" width="3" height="5" rx="1"/><rect x="5" y="4" width="3" height="8" rx="1"/><rect x="10" y="2" width="3" height="10" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1" opacity=".35"/></svg>
+        <svg width="26" height="13" viewBox="0 0 26 13" fill="none"><rect x="1" y="1" width="21" height="11" rx="3" stroke="currentColor" stroke-width="1.2" opacity=".5"/><rect x="3" y="3" width="11" height="7" rx="1.5" fill="currentColor"/></svg>
+      </span></div>
+      <div class="reader">
+        <div class="r-appbar">
+          <div class="iconbtn"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M15 6l-6 6 6 6"/></svg></div>
+          <div class="r-title"><b>Mazmur 23</b><span>Mazmur Daud</span></div>
+          <div style="display:flex">
+            <div class="iconbtn" style="font-family:var(--serif);font-weight:600"><span style="font-size:13px">A</span><span style="font-size:19px">A</span></div>
+            <div class="iconbtn"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1Z"/></svg></div>
+          </div>
+        </div>
+        <div class="scroll">
+          <div class="chapno"><div class="num">23</div><div class="lbl">Mazmur</div></div>
+          <div class="section-head">TUHAN, gembalaku</div>
+          <p class="scripture">
+            <span class="vn">1</span>TUHAN adalah gembalaku; aku tidak akan kekurangan apa pun. <span class="vn">2</span>Dia membaringkan aku di padang rumput yang hijau dan menuntun aku ke air yang tenang. <span class="vn">3</span>Dia menyegarkan jiwaku dan menuntun aku di jalan yang benar untuk memuliakan nama-Nya. <span class="vn">4</span>Sekalipun aku berjalan melewati lembah yang paling gelap, aku tidak takut bahaya, sebab Engkau besertaku; gada dan tongkat-Mu menghiburku.
+          </p>
+          <div class="fade"></div>
+        </div>
+        <div class="r-foot">
+          <div class="chip"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 6l-6 6 6 6"/></svg></div>
+          <div class="markbtn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12l4 4L19 6"/></svg>Tandai selesai</div>
+          <div class="chip"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ READER SETTINGS SHEET ============ -->
+  <div class="stage" id="settings">
+    <div class="caption"><b>4 · Tampilan</b><span>tiga tema baca, ukuran teks, nomor ayat, warna perkataan Yesus</span></div>
+    <div class="phone" data-theme="pagi">
+      <div class="notch"></div>
+      <div class="statusbar"><span>7:33</span><span class="ic">
+        <svg width="18" height="12" viewBox="0 0 18 12" fill="currentColor"><rect x="0" y="7" width="3" height="5" rx="1"/><rect x="5" y="4" width="3" height="8" rx="1"/><rect x="10" y="2" width="3" height="10" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1" opacity=".35"/></svg>
+        <svg width="26" height="13" viewBox="0 0 26 13" fill="none"><rect x="1" y="1" width="21" height="11" rx="3" stroke="currentColor" stroke-width="1.2" opacity=".5"/><rect x="3" y="3" width="15" height="7" rx="1.5" fill="currentColor"/></svg>
+      </span></div>
+      <div class="reader">
+        <div class="r-appbar">
+          <div class="iconbtn"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M15 6l-6 6 6 6"/></svg></div>
+          <div class="r-title"><b>Matius 5</b><span>Khotbah di Bukit</span></div>
+          <div style="width:42px"></div>
+        </div>
+        <div class="scroll" style="filter:blur(.3px)">
+          <div class="chapno"><div class="num">5</div><div class="lbl">Pasal</div></div>
+          <p class="scripture"><span class="vn">1</span>Waktu Yesus melihat orang banyak itu, naiklah Dia ke atas bukit dan duduk di situ. Murid-murid-Nya pun datang kepada-Nya. <span class="vn">2</span>Lalu Yesus mulai mengajar mereka, kata-Nya:</p>
+        </div>
+      </div>
+      <div class="dim"></div>
+      <div class="sheet">
+        <div class="handle"></div>
+        <h3>Tampilan</h3>
+        <div class="seg">
+          <div class="on"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M19.1 4.9l-1.8 1.8M6.7 17.3l-1.8 1.8"/></svg>Pagi</div>
+          <div><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 14a4 4 0 0 1 0-8 4 4 0 0 0 0 8Z"/><path d="M3 19h18M5.5 15.5l1.5 1M18.5 15.5l-1.5 1"/></svg>Senja</div>
+          <div><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.3 6.3 0 0 0 10.5 10.5Z"/></svg>Malam</div>
+        </div>
+        <div class="row">
+          <div class="lab">Ukuran teks</div>
+          <div class="stepper"><button>A−</button><div class="v" style="font-family:var(--serif)">Aa</div><button style="font-size:24px">A+</button></div>
+        </div>
+        <div class="row"><div class="lab">Tampilkan nomor ayat</div><div class="switch"></div></div>
+        <div class="row"><div class="lab">Perkataan Yesus berwarna</div><div class="switch"></div></div>
+        <div class="row" style="border-bottom:1px solid var(--hairline)"><div class="lab">Tetap nyala saat membaca</div><div class="switch off"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ LIBRARY ============ -->
+  <div class="stage" id="library">
+    <div class="caption"><b>5 · Alkitab</b><span>Perjanjian Lama yang masih dalam pengerjaan ditandai “segera”, bukan jalan buntu</span></div>
+    <div class="phone" data-theme="pagi">
+      <div class="notch"></div>
+      <div class="statusbar"><span>7:40</span><span class="ic">
+        <svg width="18" height="12" viewBox="0 0 18 12" fill="currentColor"><rect x="0" y="7" width="3" height="5" rx="1"/><rect x="5" y="4" width="3" height="8" rx="1"/><rect x="10" y="2" width="3" height="10" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1" opacity=".35"/></svg>
+        <svg width="26" height="13" viewBox="0 0 26 13" fill="none"><rect x="1" y="1" width="21" height="11" rx="3" stroke="currentColor" stroke-width="1.2" opacity=".5"/><rect x="3" y="3" width="15" height="7" rx="1.5" fill="currentColor"/></svg>
+      </span></div>
+      <div class="appbar">
+        <div class="title" style="padding-left:8px">Alkitab</div>
+        <div class="iconbtn"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></div>
+      </div>
+      <div class="tabs">
+        <div class="tab on">Perjanjian Lama</div>
+        <div class="tab">Perjanjian Baru</div>
+      </div>
+      <div class="note"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg>Sebagian kitab Perjanjian Lama masih dalam pengerjaan dan akan hadir bertahap.</div>
+      <div class="body"><div class="booklist">
+        <div class="book"><div class="bn">Kej</div><div><div class="nm">Kejadian</div><div class="ct">50 pasal</div></div><div class="chev"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 6l6 6-6 6"/></svg></div></div>
+        <div class="book"><div class="bn">Kel</div><div><div class="nm">Keluaran</div><div class="ct">40 pasal</div></div><div class="chev"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 6l6 6-6 6"/></svg></div></div>
+        <div class="book"><div class="bn">Maz</div><div><div class="nm">Mazmur</div><div class="ct">150 pasal</div></div><div class="chev"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 6l6 6-6 6"/></svg></div></div>
+        <div class="book"><div class="bn">Ams</div><div><div class="nm">Amsal</div><div class="ct">31 pasal</div></div><div class="chev"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 6l6 6-6 6"/></svg></div></div>
+        <div class="book"><div class="bn">Yes</div><div><div class="nm">Yesaya</div><div class="ct">66 pasal</div></div><div class="chev"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 6l6 6-6 6"/></svg></div></div>
+        <div class="book soon"><div class="bn">Nah</div><div><div class="nm">Nahum</div><div class="ct">3 pasal</div></div><div class="tag-soon">Segera</div></div>
+        <div class="book soon"><div class="bn">Hab</div><div><div class="nm">Habakuk</div><div class="ct">3 pasal</div></div><div class="tag-soon">Segera</div></div>
+      </div></div>
+      <div class="nav">
+        <a><svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V20h14V9.5"/></svg>Beranda</a>
+        <a class="on"><svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 5.5A2 2 0 0 1 5 4h6v16H5a2 2 0 0 0-2 1.5V5.5Z"/><path d="M21 5.5A2 2 0 0 0 19 4h-6v16h6a2 2 0 0 1 2 1.5V5.5Z"/></svg>Baca</a>
+        <a><svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="5" width="18" height="16" rx="2.5"/><path d="M3 9h18M8 3v4M16 3v4"/></svg>Rencana</a>
+        <a><svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>Pengaturan</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ PLAN ============ -->
+  <div class="stage" id="plan">
+    <div class="caption"><b>6 · Rencana Baca</b><span>kecepatan sederhana: mulai dari mana, berapa pasal/hari, jadwal otomatis</span></div>
+    <div class="phone" data-theme="pagi">
+      <div class="notch"></div>
+      <div class="statusbar"><span>7:45</span><span class="ic">
+        <svg width="18" height="12" viewBox="0 0 18 12" fill="currentColor"><rect x="0" y="7" width="3" height="5" rx="1"/><rect x="5" y="4" width="3" height="8" rx="1"/><rect x="10" y="2" width="3" height="10" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1" opacity=".35"/></svg>
+        <svg width="26" height="13" viewBox="0 0 26 13" fill="none"><rect x="1" y="1" width="21" height="11" rx="3" stroke="currentColor" stroke-width="1.2" opacity=".5"/><rect x="3" y="3" width="15" height="7" rx="1.5" fill="currentColor"/></svg>
+      </span></div>
+      <div class="appbar">
+        <div class="iconbtn"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M15 6l-6 6 6 6"/></svg></div>
+        <div class="title">Rencana Baca</div>
+        <div style="width:42px"></div>
+      </div>
+      <div class="body"><div class="pad">
+        <div class="plan-intro">Baca dengan langkah yang pas untukmu.</div>
+        <div class="plan-sub">Tentukan dari mana mulai dan berapa pasal sehari. Teduh menyusun jadwalnya, kamu tinggal membaca.</div>
+
+        <div class="field">
+          <div class="fr" style="border-bottom:1px solid var(--hairline)"><div class="l">Mulai dari</div><div class="r">Matius 1 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="1.8"><path d="M9 6l6 6-6 6"/></svg></div></div>
+          <div class="fr"><div class="l">Kecepatan</div>
+            <div class="stepper"><button>−</button><div class="v">3</div><button>+</button></div>
+          </div>
+        </div>
+        <div style="font-size:12px;color:var(--muted);margin:-6px 0 16px;padding-left:4px">pasal per hari</div>
+
+        <div class="estimate">
+          <div class="big">Kamu menamatkan <em>Perjanjian Baru</em> dalam <em>± 90 hari</em>.</div>
+        </div>
+
+        <div class="overline" style="margin:6px 0 8px">Pratinjau jadwal</div>
+        <div class="sched">
+          <div class="s first"><div class="d">HARI 1</div><div class="p">Matius 1–3</div></div>
+          <div class="s"><div class="d">HARI 2</div><div class="p">Matius 4–6</div></div>
+          <div class="s"><div class="d">HARI 3</div><div class="p">Matius 7–9</div></div>
+          <div class="s"><div class="d">HARI 4</div><div class="p">Matius 10–12</div></div>
+        </div>
+      </div></div>
+      <div style="padding:0 22px 26px"><button class="btn">Mulai rencana</button></div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
