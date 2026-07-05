@@ -73,9 +73,13 @@ final streakProvider = FutureProvider<Streak>((ref) async {
 });
 
 final isTodayDoneProvider = FutureProvider<bool>((ref) async {
+  final plan = await ref.watch(activePlanProvider.future);
   final idx = await ref.watch(todayDayIndexProvider.future);
-  if (idx == null) return false;
-  return ref.watch(progressRepositoryProvider).isDayCompleted(idx);
+  if (plan == null || idx == null) return false;
+  // Scope to the active plan: reading_progress rows persist across plans and
+  // every plan starts at day 0, so an unscoped index match would falsely report
+  // today's early days as done under a fresh plan.
+  return ref.watch(progressRepositoryProvider).isDayCompleted(plan.id, idx);
 });
 
 // ----------------------------------------------------------------- mutations
@@ -94,11 +98,18 @@ Future<void> savePlanAction(WidgetRef ref, ReadingPlan plan) async {
 /// stamped with owner/group and pushed (fire-and-forget) for "baca bersama".
 Future<void> markTodayReadAction(WidgetRef ref) async {
   final plan = await ref.read(activePlanProvider.future);
-  final idx = await ref.read(todayDayIndexProvider.future);
-  final reading = await ref.read(todaysReadingProvider.future);
   final clock = ref.read(clockProvider);
   final auth = ref.read(authProvider);
   final group = await ref.read(groupRepositoryProvider).activeGroup();
+
+  // Derive the day from a single fresh clock read so idx, passage and localDate
+  // are always the same "today" — never a stale cached index paired with a
+  // rolled-over date (which would stamp yesterday's day_index on today's row).
+  final today = CalendarDate.fromLocal(clock.nowLocal());
+  final idx = plan == null ? null : _engine.dayIndexFor(plan.startDate, today);
+  final reading = plan == null
+      ? null
+      : _engine.today(await ref.read(booksProvider.future), plan, today);
 
   final planId = plan?.id;
   final isGroupPlan = group != null && planId == group.id;
@@ -113,7 +124,7 @@ Future<void> markTodayReadAction(WidgetRef ref) async {
         passage: (reading != null && reading.chapters.isNotEmpty)
             ? reading.chapters.first
             : null,
-        localDate: CalendarDate.fromLocal(clock.nowLocal()),
+        localDate: today,
         completedAt: clock.nowUtc(),
         updatedAt: clock.nowUtc(),
         userId: auth.isSignedIn ? auth.userId : null,

@@ -37,6 +37,4 @@ class DailyReading {
   final int dayIndex; // 0-based
   final List<BibleRef> chapters;
   final int totalDays;
-
-  bool get isComplete => dayIndex >= totalDays;
 }

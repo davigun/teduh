@@ -30,7 +30,7 @@ class _FakeProgress implements ProgressRepository {
   @override
   Future<Set<CalendarDate>> completedDates() async => {};
   @override
-  Future<bool> isDayCompleted(int dayIndex) async => false;
+  Future<bool> isDayCompleted(String planId, int dayIndex) async => false;
   @override
   Future<void> markRead(DayCompletion completion) async {}
 }

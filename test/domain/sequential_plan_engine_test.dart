@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:teduh/core/time/calendar_date.dart';
 import 'package:teduh/domain/entities/bible.dart';
+import 'package:teduh/domain/entities/plan.dart';
 import 'package:teduh/domain/services/sequential_plan_engine.dart';
 
 void main() {
@@ -57,7 +58,36 @@ void main() {
       final u = engine.chapterUniverse(books, const BibleRef('MAT', 1), const BibleRef('LUK', 2));
       final d = engine.readingForDay(u, 2, 10);
       expect(d.chapters, isEmpty);
-      expect(d.isComplete, isTrue);
+      expect(d.dayIndex, greaterThanOrEqualTo(d.totalDays));
+    });
+
+    // Day-change contract: with a fixed startDate, the day index and today's
+    // reading must advance as "today" rolls forward — the domain oracle for the
+    // cached-"today" provider bug.
+    test('day index and reading advance as today rolls forward', () {
+      final plan = ReadingPlan(
+        id: 'p',
+        start: const BibleRef('MAT', 1),
+        end: const BibleRef('LUK', 2),
+        chaptersPerDay: 2,
+        startDate: const CalendarDate(2026, 1, 1),
+        updatedAt: DateTime.utc(2026, 1, 1),
+      );
+      expect(engine.dayIndexFor(plan.startDate, const CalendarDate(2026, 1, 1)), 0);
+      expect(engine.dayIndexFor(plan.startDate, const CalendarDate(2026, 1, 2)), 1);
+      expect(engine.dayIndexFor(plan.startDate, const CalendarDate(2026, 1, 3)), 2);
+
+      expect(engine.today(books, plan, const CalendarDate(2026, 1, 1)).chapters.map((r) => '$r'),
+          ['MAT 1', 'MAT 2']);
+      expect(engine.today(books, plan, const CalendarDate(2026, 1, 2)).chapters.map((r) => '$r'),
+          ['MAT 3', 'MRK 1']);
+    });
+
+    test('a plan whose startDate is in the future clamps to day 0', () {
+      expect(
+        engine.dayIndexFor(const CalendarDate(2026, 6, 10), const CalendarDate(2026, 6, 5)),
+        0,
+      );
     });
   });
 }

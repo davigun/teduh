@@ -45,6 +45,9 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<!-- Only HTTPS + platform crypto (exempt); skips App Store export-compliance prompt. -->
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<!-- Google Sign-In callback. Replace the string below with your REVERSED iOS
 	     client ID (from Google Cloud → iOS OAuth client). It looks like
 	     com.googleusercontent.apps.1234567890-abcdef . Until set, the email/password

@@ -11,6 +11,7 @@ import '../../../design/tokens/app_spacing.dart';
 import '../../../design/tokens/app_typography.dart';
 import '../../../design/widgets/primary_button.dart';
 import '../../../design/widgets/section_card.dart';
+import 'start_picker.dart';
 
 /// Sequential plan setup. P1 reads through the New Testament (Matius → Wahyu);
 /// a start-point picker is a small follow-up. Pace is adjustable and the
@@ -136,56 +137,9 @@ class _PlanSetupScreenState extends ConsumerState<PlanSetupScreen> {
   }
 
   Future<void> _pickStart(BuildContext context) async {
-    final available =
-        (ref.read(booksProvider).value ?? const []).where((b) => b.isAvailable).toList();
-    final picked = await showModalBottomSheet<BibleRef>(
-      context: context,
-      showDragHandle: true,
-      isScrollControlled: true,
-      builder: (_) => _StartPicker(books: available),
-    );
+    final picked =
+        await showStartPicker(context, ref.read(booksProvider).value ?? const []);
     if (picked != null) setState(() => _start = picked);
-  }
-}
-
-class _StartPicker extends StatelessWidget {
-  const _StartPicker({required this.books});
-  final List<BibleBook> books;
-
-  @override
-  Widget build(BuildContext context) {
-    final c = context.colors;
-    return SafeArea(
-      child: ConstrainedBox(
-        constraints:
-            BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.6),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(
-                  AppSpacing.xxl, AppSpacing.xs, AppSpacing.xxl, AppSpacing.sm),
-              child: Text('Mulai dari',
-                  style: AppType.title.copyWith(color: c.ink, fontSize: 20)),
-            ),
-            Flexible(
-              child: ListView.builder(
-                shrinkWrap: true,
-                itemCount: books.length,
-                itemBuilder: (context, i) => ListTile(
-                  title: Text(books[i].nama,
-                      style: AppType.body.copyWith(color: c.ink, fontSize: 16)),
-                  trailing: Text('${books[i].chapterCount} pasal',
-                      style: AppType.caption.copyWith(color: c.muted)),
-                  onTap: () => Navigator.pop(context, BibleRef(books[i].code, 1)),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
   }
 }
 

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/database/databases.dart';
 import '../../design/tokens/app_colors.dart';
 import '../../design/tokens/app_typography.dart';
+import '../day_change_refresher.dart';
 import '../sync_controller.dart';
 
 /// One-time async startup: installs the read-only bible.db from assets and opens
@@ -22,7 +23,7 @@ class AppStartupGate extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final startup = ref.watch(appStartupProvider);
     return startup.when(
-      data: (_) => _SyncBridge(child: child),
+      data: (_) => DayChangeRefresher(child: _SyncBridge(child: child)),
       loading: () => const _Splash(),
       error: (e, _) => _StartupError(message: '$e'),
     );

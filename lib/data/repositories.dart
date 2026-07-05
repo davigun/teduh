@@ -146,9 +146,13 @@ class SqliteProgressRepository implements ProgressRepository {
   }
 
   @override
-  Future<bool> isDayCompleted(int dayIndex) async {
+  Future<bool> isDayCompleted(String planId, int dayIndex) async {
+    // Scoped to the plan: rows persist across plans (save() only flips is_active)
+    // and every plan starts at day 0, so an unscoped match would report a new
+    // plan's early days as already done.
     final rows = _db.select(
-        'SELECT 1 FROM reading_progress WHERE day_index = ? LIMIT 1', [dayIndex]);
+        'SELECT 1 FROM reading_progress WHERE plan_id = ? AND day_index = ? LIMIT 1',
+        [planId, dayIndex]);
     return rows.isNotEmpty;
   }
 

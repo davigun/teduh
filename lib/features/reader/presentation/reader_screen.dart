@@ -7,12 +7,14 @@ import '../../../app/queries.dart';
 import '../../../app/router/app_router.dart';
 import '../../../app/theme_controller.dart';
 import '../../../core/errors/app_exception.dart';
+import '../../../data/devotion/santapan_harian_service.dart';
 import '../../../domain/entities/bible.dart';
 import '../../../design/theme/reading_theme.dart';
 import '../../../design/tokens/app_colors.dart';
 import '../../../design/tokens/app_spacing.dart';
 import '../../../design/tokens/app_typography.dart';
 import '../../../design/widgets/reading_size_stepper.dart';
+import '../../../design/widgets/section_card.dart';
 import '../../../design/widgets/segmented_control.dart';
 
 /// Pembaca — the reading surface. Renders real TSI text: serif on warm paper,
@@ -36,6 +38,14 @@ class ReaderScreen extends ConsumerWidget {
         books.where((b) => b.code == bookCode).map((b) => b.chapterCount).firstOrNull;
     final scale = readingScaleSteps[ref.watch(readingScaleProvider)];
     final showVerses = ref.watch(showVerseNumbersProvider);
+
+    // Closing devotion: only under the LAST chapter of today's plan reading.
+    final todays = ref.watch(todaysReadingProvider).value;
+    final isTodaysClosing = todays != null &&
+        todays.chapters.isNotEmpty &&
+        todays.chapters.last == ref0;
+    final devotion =
+        isTodaysClosing ? ref.watch(devotionProvider).value : null;
 
     return Scaffold(
       backgroundColor: c.bg,
@@ -64,7 +74,10 @@ class ReaderScreen extends ConsumerWidget {
         data: (chap) => ListView(
           padding: const EdgeInsets.fromLTRB(
               AppSpacing.xxl, AppSpacing.md, AppSpacing.xxl, AppSpacing.x4),
-          children: _buildBlocks(context, chap, scale, showVerses),
+          children: [
+            ..._buildBlocks(context, chap, scale, showVerses),
+            if (devotion != null) _DevotionCard(devotion: devotion),
+          ],
         ),
       ),
       bottomNavigationBar: _ReaderFooter(
@@ -163,6 +176,43 @@ class ReaderScreen extends ConsumerWidget {
     }
     if (i < v.text.length) out.add(TextSpan(text: v.text.substring(i)));
     return out;
+  }
+}
+
+/// The gentle closing after today's reading: one Santapan Harian devotion.
+class _DevotionCard extends StatelessWidget {
+  const _DevotionCard({required this.devotion});
+  final Devotion devotion;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.colors;
+    return Padding(
+      padding: const EdgeInsets.only(top: AppSpacing.x3),
+      child: SectionCard(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('RENUNGAN · SANTAPAN HARIAN',
+                style: AppType.overline.copyWith(color: c.muted)),
+            const SizedBox(height: AppSpacing.md),
+            Text(devotion.title,
+                style: AppType.title.copyWith(color: c.ink, fontSize: 19)),
+            const SizedBox(height: AppSpacing.xs),
+            Text('Bacaan: ${devotion.passage}',
+                style: AppType.caption.copyWith(color: c.accent)),
+            const SizedBox(height: AppSpacing.lg),
+            Text(devotion.body,
+                style: AppType.body.copyWith(color: c.ink2, height: 1.6)),
+            const SizedBox(height: AppSpacing.lg),
+            Text(
+              '© Scripture Union Indonesia (Yay. Pancar Pijar Alkitab) · via SABDA, alkitab.mobi',
+              style: AppType.caption.copyWith(color: c.muted),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
 

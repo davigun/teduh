@@ -74,5 +74,34 @@ void main() {
       expect(s.readToday, isTrue);
       expect(s.behind, 0);
     });
+
+    // Day-change contract: with the SAME completedDays, as the scheduled day
+    // advances (a real midnight rollover), readToday must clear and behind grow.
+    // This is the group-side oracle for the provider rollover bug.
+    test('as the scheduled day advances, readToday clears then behind grows', () {
+      const done = {0, 1, 2};
+      final onDay2 = calc.stageFor(member, done, 2, isMe: false);
+      expect(onDay2.readToday, isTrue);
+      expect(onDay2.behind, 0);
+
+      final onDay3 = calc.stageFor(member, done, 3, isMe: false);
+      expect(onDay3.readToday, isFalse); // today (day 3) not yet read
+      expect(onDay3.behind, 0); // day 3 is today, grace
+
+      final onDay4 = calc.stageFor(member, done, 4, isMe: false);
+      expect(onDay4.readToday, isFalse);
+      expect(onDay4.behind, 1); // day 3 elapsed unread
+    });
+
+    test('a jump-ahead member stops reading-today once the schedule passes their day', () {
+      expect(calc.stageFor(member, const {0, 5}, 5, isMe: false).readToday, isTrue);
+      expect(calc.stageFor(member, const {0, 5}, 6, isMe: false).readToday, isFalse);
+    });
+
+    test('reading ahead of schedule never goes negative-behind', () {
+      final ahead = calc.stageFor(member, const {0, 1, 2}, 1, isMe: false);
+      expect(ahead.behind, 0);
+      expect(ahead.highWater, 2);
+    });
   });
 }

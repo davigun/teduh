@@ -7,6 +7,7 @@ import '../../../app/auth_controller.dart';
 import '../../../app/group_providers.dart';
 import '../../../app/queries.dart';
 import '../../../app/router/app_router.dart';
+import '../../../domain/entities/bible.dart';
 import '../../../domain/entities/group.dart';
 import '../../../domain/services/auth_service.dart';
 import '../../../design/tokens/app_colors.dart';
@@ -15,6 +16,7 @@ import '../../../design/tokens/app_typography.dart';
 import '../../../design/widgets/adaptive_scaffold.dart';
 import '../../../design/widgets/primary_button.dart';
 import '../../../design/widgets/section_card.dart';
+import '../../plan/presentation/start_picker.dart';
 
 /// "Bersama" — a primary tab. Create or join a group and follow each other's
 /// pace. Reading itself never depends on this screen; it only adds the social
@@ -454,6 +456,7 @@ class _CreateSheet extends ConsumerStatefulWidget {
 
 class _CreateSheetState extends ConsumerState<_CreateSheet> {
   final _name = TextEditingController();
+  BibleRef? _start; // group's starting passage; defaults to the active plan's
   bool _busy = false;
   String? _error;
 
@@ -461,6 +464,12 @@ class _CreateSheetState extends ConsumerState<_CreateSheet> {
   void dispose() {
     _name.dispose();
     super.dispose();
+  }
+
+  Future<void> _pickStart() async {
+    final picked =
+        await showStartPicker(context, ref.read(booksProvider).value ?? const []);
+    if (picked != null) setState(() => _start = picked);
   }
 
   Future<void> _submit() async {
@@ -478,7 +487,7 @@ class _CreateSheetState extends ConsumerState<_CreateSheet> {
     try {
       await createGroupAction(ref,
           name: name,
-          start: plan.start,
+          start: _start ?? plan.start,
           end: plan.end,
           chaptersPerDay: plan.chaptersPerDay);
       if (mounted) Navigator.pop(context);
@@ -495,6 +504,9 @@ class _CreateSheetState extends ConsumerState<_CreateSheet> {
     final c = context.colors;
     final plan = ref.watch(activePlanProvider).value;
     final names = ref.watch(bookNamesProvider).value ?? const {};
+    // Fallback is never rendered: it only applies in the plan == null branch,
+    // which shows the "atur rencana dulu" prompt instead of the start row.
+    final start = _start ?? plan?.start ?? const BibleRef('MAT', 1);
 
     return _SheetFrame(
       title: 'Buat grup',
@@ -525,20 +537,40 @@ class _CreateSheetState extends ConsumerState<_CreateSheet> {
                   style: AppType.body.copyWith(color: c.ink),
                 ),
                 const SizedBox(height: AppSpacing.lg),
-                Container(
-                  padding: const EdgeInsets.all(AppSpacing.lg),
-                  decoration: BoxDecoration(
-                      color: c.sunken, borderRadius: AppRadii.cardMd),
-                  child: Row(children: [
-                    Icon(Icons.menu_book_outlined, size: 18, color: c.accent),
-                    const SizedBox(width: AppSpacing.md),
-                    Expanded(
-                      child: Text(
-                        '${names[plan.start.bookCode] ?? plan.start.bookCode} – ${names[plan.end.bookCode] ?? plan.end.bookCode} · ${plan.chaptersPerDay} pasal/hari · mulai hari ini',
-                        style: AppType.caption.copyWith(color: c.ink2),
+                InkWell(
+                  borderRadius: AppRadii.cardMd,
+                  onTap: _pickStart,
+                  child: Container(
+                    padding: const EdgeInsets.all(AppSpacing.lg),
+                    decoration: BoxDecoration(
+                        color: c.sunken, borderRadius: AppRadii.cardMd),
+                    child: Row(children: [
+                      Icon(Icons.menu_book_outlined, size: 18, color: c.accent),
+                      const SizedBox(width: AppSpacing.md),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('Mulai dari',
+                                style:
+                                    AppType.caption.copyWith(color: c.muted)),
+                            const SizedBox(height: 2),
+                            Text(
+                              '${names[start.bookCode] ?? start.bookCode} ${start.chapter}',
+                              style: AppType.body.copyWith(
+                                  color: c.ink, fontWeight: FontWeight.w600),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  ]),
+                      Icon(Icons.chevron_right, color: c.muted, size: 20),
+                    ]),
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.sm),
+                Text(
+                  's/d ${names[plan.end.bookCode] ?? plan.end.bookCode} · ${plan.chaptersPerDay} pasal/hari · mulai hari ini',
+                  style: AppType.caption.copyWith(color: c.muted),
                 ),
                 if (_error != null) ...[
                   const SizedBox(height: AppSpacing.md),

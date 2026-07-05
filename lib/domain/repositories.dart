@@ -19,7 +19,7 @@ abstract interface class PlanRepository {
 /// Local reading progress.
 abstract interface class ProgressRepository {
   Future<Set<CalendarDate>> completedDates();
-  Future<bool> isDayCompleted(int dayIndex);
+  Future<bool> isDayCompleted(String planId, int dayIndex);
   Future<void> markRead(DayCompletion completion);
 }
 

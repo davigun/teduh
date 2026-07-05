@@ -45,4 +45,41 @@ void main() {
     final s = calc.compute({d(28), d(29)}, today);
     expect(s.current, 2);
   });
+
+  // Day-change contract: with the SAME history, the streak must move correctly
+  // as "today" advances. This is the domain oracle for the provider-level
+  // rollover bug — if a cached "today" froze, current would be wrong here.
+  group('same history across an advancing today', () {
+    final dates = {d(27), d(28), d(29)};
+
+    test('read through today → full active run', () {
+      final s = calc.compute(dates, d(29));
+      expect(s.isActive, isTrue);
+      expect(s.current, 3);
+      expect(s.longest, 3);
+    });
+
+    test('rolling to an unread tomorrow keeps the run (grace, no inflate)', () {
+      final s = calc.compute(dates, d(30));
+      expect(s.isActive, isTrue);
+      expect(s.current, 3); // yesterday-grace: not 4, not 0
+      expect(s.longest, 3);
+    });
+
+    test('a second unread day breaks the active run', () {
+      final s = calc.compute(dates, d(31));
+      expect(s.isActive, isFalse);
+      expect(s.current, 0);
+      expect(s.longest, 3); // history preserved
+    });
+  });
+
+  test('a completion dated in the future keeps the streak inactive (current behaviour)', () {
+    // Backward local-date shift (west across the date line): newest completion
+    // is "tomorrow" relative to today. Pinned so any future change is deliberate.
+    final s = calc.compute({d(28), d(29), d(30)}, today); // today = 29
+    expect(s.isActive, isFalse);
+    expect(s.current, 0);
+    expect(s.longest, 3);
+  });
 }

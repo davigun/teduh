@@ -41,6 +41,12 @@ class AboutScreen extends StatelessWidget {
             'Sumber: eBible.org (indayt).',
             style: AppType.body.copyWith(color: c.ink2, height: 1.55),
           ),
+          const SizedBox(height: AppSpacing.md),
+          Text(
+            'Renungan — Santapan Harian. Hak cipta © Scripture Union Indonesia '
+            '(Yayasan Pancar Pijar Alkitab). Ditampilkan dari SABDA (alkitab.mobi).',
+            style: AppType.body.copyWith(color: c.ink2, height: 1.55),
+          ),
           const SizedBox(height: AppSpacing.lg),
           Text(
             'Karena Perjanjian Lama (AYT) berlisensi non-komersial, Teduh '
