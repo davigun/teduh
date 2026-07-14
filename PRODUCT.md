@@ -1,6 +1,6 @@
 # Product
 
-> Working name: **Teduh** — Indonesian for *calm / serene*, and the root of *saat teduh*, the everyday Indonesian term for a daily quiet time with Scripture. Placeholder; rename freely.
+> Name: **Koinonia** — Greek for *fellowship / communion*, reflecting the app's "read together" core. The UI copy keeps *saat teduh*, the everyday Indonesian term for a daily quiet time with Scripture, as descriptive language.
 
 ## Register
 

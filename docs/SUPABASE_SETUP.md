@@ -1,4 +1,4 @@
-# Supabase backend setup (for Teduh P3 "Read Together")
+# Supabase backend setup (for Koinonia P3 "Read Together")
 
 What you do in the Supabase dashboard + the SQL to paste. Split into **P3a (auth — do first)** and **P3b (groups + progress sync)**. Reading stays fully offline regardless; this only powers the social layer. See `docs/P3_SUPABASE.md` for the why.
 
@@ -23,7 +23,7 @@ What you do in the Supabase dashboard + the SQL to paste. Split into **P3a (auth
 ### Dashboard
 0. **Anonymous (PRIMARY sign-in method) — REQUIRED.** Account model is anonymous-first: a device-local account from just a name. Enable **Authentication → Sign In / Providers → "Anonymous Sign-Ins" → ON** (in some dashboard versions it's under **Authentication → Providers → Anonymous**). Without this, "Lanjutkan" fails with `anonymous_provider_disabled`.
 1. **Authentication → Providers → Email:** enable (optional durable upgrade path). For an MVP you can turn **"Confirm email" off** to skip the email round-trip (turn it on before a real launch).
-2. **Authentication → URL Configuration → Redirect URLs:** add `io.teduh.app://login-callback` (used by OAuth + email links).
+2. **Authentication → URL Configuration → Redirect URLs:** add `io.koinonia.app://login-callback` (used by OAuth + email links).
 3. **Google** (optional durable upgrade; see "Google Sign-In (native)" below):
    - Google Cloud Console → create OAuth client IDs: one **Web** (this is the Supabase "Client ID") and one **iOS**.
    - Supabase → Auth → Providers → **Google**: paste the **Web** client ID + secret, and **enable "Skip nonce checks"** (iOS native Google sends no nonce).
@@ -32,7 +32,7 @@ What you do in the Supabase dashboard + the SQL to paste. Split into **P3a (auth
    - Apple Developer → create a **Service ID** + **Sign in with Apple key**.
    - Supabase → Auth → Providers → **Apple**: fill Service ID / Team ID / Key.
    - Xcode → Signing & Capabilities → add **Sign in with Apple**.
-5. iOS deep link: in `ios/Runner/Info.plist` add a URL scheme `io.teduh.app` (CFBundleURLTypes) so the redirect returns to the app.
+5. iOS deep link: in `ios/Runner/Info.plist` add a URL scheme `io.koinonia.app` (CFBundleURLTypes) so the redirect returns to the app.
 
 ### SQL — run in **SQL Editor** (creates the profile table + auto-create trigger)
 ```sql
@@ -49,13 +49,21 @@ create policy "profiles_self_select" on public.profiles
 create policy "profiles_self_update" on public.profiles
   for update using ((select auth.uid()) = id) with check ((select auth.uid()) = id);
 
+-- cap display_name so a group-mate can't render megabytes into everyone's UI
+do $$ begin
+  if not exists (select 1 from pg_constraint where conname = 'profiles_display_name_len') then
+    alter table public.profiles
+      add constraint profiles_display_name_len check (char_length(display_name) <= 40);
+  end if;
+end $$;
+
 -- auto-create a profile on signup (works for every provider)
 create or replace function public.handle_new_user()
 returns trigger language plpgsql security definer set search_path = '' as $$
 begin
   insert into public.profiles (id, display_name)
-  values (new.id, coalesce(new.raw_user_meta_data->>'display_name',
-                           new.raw_user_meta_data->>'full_name', 'Pembaca'))
+  values (new.id, left(coalesce(new.raw_user_meta_data->>'display_name',
+                                new.raw_user_meta_data->>'full_name', 'Pembaca'), 40))
   on conflict (id) do nothing;
   return new;
 end; $$;
@@ -156,12 +164,37 @@ create policy "members_self_delete" on public.group_members   -- leave a group
 drop policy if exists "progress_select" on public.reading_progress;
 create policy "progress_select" on public.reading_progress
   for select using (user_id = (select auth.uid()) or public.is_group_member(group_id));
+-- writes: own rows only, group_id only for groups you're actually in (else an
+-- outsider who learns a group uuid could pollute its progress mirror), sane day_index.
 drop policy if exists "progress_insert_own" on public.reading_progress;
 create policy "progress_insert_own" on public.reading_progress
-  for insert with check (user_id = (select auth.uid()));
+  for insert with check (
+    user_id = (select auth.uid())
+    and (group_id is null or public.is_group_member(group_id))
+    and day_index between 0 and 9999);
 drop policy if exists "progress_update_own" on public.reading_progress;
 create policy "progress_update_own" on public.reading_progress
-  for update using (user_id = (select auth.uid())) with check (user_id = (select auth.uid()));
+  for update using (user_id = (select auth.uid())) with check (
+    user_id = (select auth.uid())
+    and (group_id is null or public.is_group_member(group_id))
+    and day_index between 0 and 9999);
+drop policy if exists "progress_delete_own" on public.reading_progress;
+create policy "progress_delete_own" on public.reading_progress
+  for delete using (user_id = (select auth.uid()));
+
+-- leaving a group stops sharing: detach the leaver's progress rows from the
+-- group so remaining members lose read access (rows themselves stay = the
+-- user's own history survives).
+create or replace function public.detach_progress_on_leave()
+returns trigger language plpgsql security definer set search_path = '' as $$
+begin
+  update public.reading_progress set group_id = null
+    where user_id = old.user_id and group_id = old.group_id;
+  return old;
+end; $$;
+drop trigger if exists group_members_detach_trg on public.group_members;
+create trigger group_members_detach_trg after delete on public.group_members
+  for each row execute function public.detach_progress_on_leave();
 
 -- ---------- LWW + clock-clamp on progress writes ----------
 create or replace function public.reading_progress_lww()
@@ -200,23 +233,55 @@ create or replace function public.create_group(
   p_name text, p_start_book text, p_start_chapter int,
   p_end_book text, p_end_chapter int, p_pace int, p_start_date date)
 returns public.groups language plpgsql security definer set search_path = '' as $$
-declare g public.groups;
+declare g public.groups; owned int;
 begin
   if auth.uid() is null then raise exception 'not_authenticated'; end if;
+  if p_name is null or btrim(p_name) = '' or char_length(p_name) > 40
+    then raise exception 'invalid_name'; end if;
+  if p_pace is null or p_pace < 1 or p_pace > 50
+    then raise exception 'invalid_pace'; end if;
+  if coalesce(p_start_chapter, 0) < 1 or coalesce(p_end_chapter, 0) < 1
+     or p_start_chapter > 150 or p_end_chapter > 150   -- Psalms = 150, the max
+    then raise exception 'invalid_plan'; end if;
+  select count(*) into owned from public.group_members
+    where user_id = auth.uid() and role = 'owner';
+  if owned >= 10 then raise exception 'too_many_groups'; end if;
+  -- join code: 6 chars from a 32-symbol unambiguous alphabet (no 0/O/1/I) = ~1.07B codes
   insert into public.groups(name, join_code, created_by, start_book, start_chapter,
        end_book, end_chapter, chapters_per_day, start_date)
-    values (p_name, upper(substr(replace(gen_random_uuid()::text,'-',''),1,6)),
+    values (btrim(p_name),
+       (select string_agg(substr('ABCDEFGHJKMNPQRSTUVWXYZ23456789', 1 + floor(random()*31)::int, 1), '')
+          from generate_series(1, 6)),
        auth.uid(), p_start_book, p_start_chapter, p_end_book, p_end_chapter, p_pace, p_start_date)
     returning * into g;
   insert into public.group_members(group_id, user_id, role) values (g.id, auth.uid(), 'owner');
   return g;
 end; $$;
 
+-- brute-force guard for join: per-uid attempt log, checked in the RPC below.
+-- No policies on purpose — only the SECURITY DEFINER function touches it.
+create table if not exists public.join_attempts (
+  user_id uuid not null,
+  attempted_at timestamptz not null default now()
+);
+create index if not exists join_attempts_user_time
+  on public.join_attempts(user_id, attempted_at);
+alter table public.join_attempts enable row level security;
+
 create or replace function public.join_group_by_code(p_code text)
 returns public.groups language plpgsql security definer set search_path = '' as $$
-declare g public.groups; cnt int;
+declare g public.groups; cnt int; attempts int;
 begin
   if auth.uid() is null then raise exception 'not_authenticated'; end if;
+  -- rate limit: 10 attempts per uid per hour. Anon accounts are free to mint,
+  -- but signups are IP-rate-limited by Supabase, so this raises brute-force
+  -- cost from "one loop" to "impractical" against the 32^6 code space.
+  delete from public.join_attempts where attempted_at < now() - interval '1 hour';  -- ponytail: opportunistic cleanup; move to pg_cron if the table ever matters
+  select count(*) into attempts from public.join_attempts
+    where user_id = auth.uid() and attempted_at > now() - interval '1 hour';
+  if attempts >= 10 then raise exception 'too_many_attempts'; end if;
+  insert into public.join_attempts(user_id) values (auth.uid());
+
   select * into g from public.groups where join_code = upper(p_code) for update;  -- locks row (capacity TOCTOU)
   if g.id is null then raise exception 'group_not_found'; end if;
   select count(*) into cnt from public.group_members where group_id = g.id;
@@ -247,9 +312,11 @@ notify pgrst, 'reload schema';
 > Verified end-to-end against the live project: create → join-by-code → progress
 > upsert (idempotent) → cross-member visibility (progress + members + profiles)
 > → negative RLS (bad code rejected, can't write another user's rows). All pass.
+> The whole block is re-runnable — after the 2026-07 security hardening (join
+> rate limit, wider code alphabet, progress write scoping, detach-on-leave,
+> input validation), re-run P3a + P3b on the live project to apply.
 
 ### Still TODO before real launch (noted, not in the SQL above)
-- **Rate-limit `join_group_by_code`** (per-uid attempt throttle) so the 6-char code can't be brute-forced to auto-join small private groups. (Low impact at 2–10 users, but do it before public release.)
 - **Last-owner-leaves** ownership transfer (a sole owner leaving orphans the group).
 - **Late-joiner UX** decision (default `start_date = today` on create) so a new member isn't instantly "tertinggal N hari" — see `P3_SUPABASE.md` §8.
 
@@ -257,14 +324,14 @@ notify pgrst, 'reload schema';
 
 ## Google Sign-In (native) — your checklist
 
-The Flutter side is **already implemented** (native `google_sign_in` v7 → `signInWithIdToken`). The "Lanjut dengan Google" button appears automatically once `GOOGLE_WEB_CLIENT_ID` is set. You only need to create the OAuth clients and paste the IDs. App bundle id: **`com.davidgunawan.teduh`**.
+The Flutter side is **already implemented** (native `google_sign_in` v7 → `signInWithIdToken`). The "Lanjut dengan Google" button appears automatically once `GOOGLE_WEB_CLIENT_ID` is set. You only need to create the OAuth clients and paste the IDs. App bundle id: **`com.davidgunawan.koinonia`**.
 
 ### A. Google Cloud Console (console.cloud.google.com)
 1. Create/select a project.
 2. **APIs & Services → OAuth consent screen** → *External* → fill app name + support email + developer email → **Save**. While it's in "Testing", add your Gmail under **Test users** (only test users can sign in until you publish).
 3. **APIs & Services → Credentials → Create credentials → OAuth client ID**, twice:
-   - **Web application** (name "Teduh Web") → copy its **Client ID** and **Client secret**. This Client ID = `GOOGLE_WEB_CLIENT_ID` *and* what Supabase needs.
-   - **iOS** (name "Teduh iOS") → **Bundle ID = `com.davidgunawan.teduh`** → copy its **Client ID** = `GOOGLE_IOS_CLIENT_ID`.
+   - **Web application** (name "Koinonia Web") → copy its **Client ID** and **Client secret**. This Client ID = `GOOGLE_WEB_CLIENT_ID` *and* what Supabase needs.
+   - **iOS** (name "Koinonia iOS") → **Bundle ID = `com.davidgunawan.koinonia`** → copy its **Client ID** = `GOOGLE_IOS_CLIENT_ID`.
 
 ### B. Supabase dashboard
 4. **Authentication → Providers → Google** → enable → paste the **Web** Client ID + secret → turn **ON "Skip nonce checks"** (iOS native sends no nonce) → **Save**.

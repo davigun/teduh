@@ -8,6 +8,7 @@ import '../../features/auth/presentation/sign_in_screen.dart';
 import '../../features/onboarding/presentation/onboarding_screen.dart';
 import '../../features/plan/presentation/plan_screen.dart';
 import '../../features/plan/presentation/plan_setup_screen.dart';
+import '../../features/reader/presentation/devotion_screen.dart';
 import '../../features/reader/presentation/reader_screen.dart';
 import '../../features/settings/presentation/about_screen.dart';
 import '../../features/settings/presentation/settings_screen.dart';
@@ -28,6 +29,7 @@ abstract final class Routes {
   static const onboarding = '/onboarding';
   static const signIn = '/sign-in';
   static const together = '/together';
+  static const devotion = '/devotion';
   static String reader(String bookCode, int chapter) => '/read/$bookCode/$chapter';
 }
 
@@ -71,6 +73,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           chapter: int.tryParse(s.pathParameters['chapter'] ?? '1') ?? 1,
         ),
       ),
+      GoRoute(path: Routes.devotion, builder: (c, s) => const DevotionScreen()),
       GoRoute(path: Routes.plan, builder: (c, s) => const PlanScreen()),
       GoRoute(path: Routes.planSetup, builder: (c, s) => const PlanSetupScreen()),
       GoRoute(path: Routes.about, builder: (c, s) => const AboutScreen()),

@@ -533,7 +533,9 @@ class _CreateSheetState extends ConsumerState<_CreateSheet> {
                 TextField(
                   controller: _name,
                   textCapitalization: TextCapitalization.words,
-                  decoration: _fieldDeco(context, 'Nama grup', 'mis. Keluarga'),
+                  maxLength: 40, // server rejects longer (invalid_name)
+                  decoration: _fieldDeco(context, 'Nama grup', 'mis. Keluarga')
+                      .copyWith(counterText: ''),
                   style: AppType.body.copyWith(color: c.ink),
                 ),
                 const SizedBox(height: AppSpacing.lg),
@@ -609,6 +611,9 @@ class _JoinSheetState extends ConsumerState<_JoinSheet> {
     final s = e.toString();
     if (s.contains('group_not_found')) return 'Kode tidak ditemukan.';
     if (s.contains('group_full')) return 'Grup sudah penuh.';
+    if (s.contains('too_many_attempts')) {
+      return 'Terlalu banyak percobaan. Coba lagi dalam satu jam.';
+    }
     if (s.contains('not_authenticated')) return 'Masuk dulu untuk bergabung.';
     return 'Gagal bergabung. Periksa kodenya.';
   }

@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:teduh/core/time/calendar_date.dart';
-import 'package:teduh/data/devotion/santapan_harian_service.dart';
+import 'package:koinonia/core/time/calendar_date.dart';
+import 'package:koinonia/data/devotion/santapan_harian_service.dart';
 
 // Trimmed from the real alkitab.mobi/renungan/sh/2026/07/02/ markup: uppercase
 // <P> body tags, entities, the "* * *" support appeal, and the #ayat full text.
@@ -55,5 +55,43 @@ void main() {
   test('returns null on a page that is not a devotion', () {
     expect(parseSantapanHarian('<html><body>404</body></html>', date), isNull);
     expect(parseSantapanHarian('', date), isNull);
+  });
+
+  group('parsePassageRef ("Bacaan:" label → local Bible location)',
+      _passageRefTests);
+}
+
+void _passageRefTests() {
+  const names = {
+    'MAT': 'Matius',
+    '1SA': '1 Samuel',
+    'PSA': 'Mazmur',
+    'JHN': 'Yohanes',
+    '1JN': '1 Yohanes',
+  };
+
+  test('book + chapter', () {
+    final p = parsePassageRef('1 Samuel 11', names)!;
+    expect(p.ref.bookCode, '1SA');
+    expect(p.ref.chapter, 11);
+    expect(p.fromVerse, isNull);
+  });
+
+  test('verse range, and longest book name wins', () {
+    final p = parsePassageRef('1 Yohanes 2:1-6', names)!;
+    expect(p.ref.bookCode, '1JN');
+    expect(p.ref.chapter, 2);
+    expect(p.fromVerse, 1);
+    expect(p.toVerse, 6);
+  });
+
+  test('single verse gets a closed range', () {
+    final p = parsePassageRef('Mazmur 119:105', names)!;
+    expect(p.fromVerse, 105);
+    expect(p.toVerse, 105);
+  });
+
+  test('unknown book → null', () {
+    expect(parsePassageRef('Kitab Antah 3', names), isNull);
   });
 }

@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../app/providers.dart';
 import '../../core/time/calendar_date.dart';
+import '../../domain/entities/bible.dart';
 
 /// One day's Santapan Harian devotion (© Scripture Union Indonesia /
 /// Yayasan Pancar Pijar Alkitab, served by SABDA at alkitab.mobi).
@@ -25,6 +26,42 @@ class Devotion {
 }
 
 const _prefsKey = 'sh_devotion';
+
+/// A devotion's "Bacaan:" reference resolved to a local Bible location.
+class PassageRef {
+  const PassageRef(this.ref, {this.fromVerse, this.toVerse});
+  final BibleRef ref;
+  final int? fromVerse;
+  final int? toVerse;
+}
+
+/// Resolve a human passage label ("1 Samuel 11:1-15", "Mazmur 119") to a local
+/// Bible location. [namesByCode] maps book code → Indonesian name; the longest
+/// matching name wins ("1 Yohanes" before "Yohanes"). Returns null when the
+/// book isn't recognized — the UI then shows just the reference label.
+// ponytail: multi-chapter refs ("Kejadian 1-2") resolve to the first chapter.
+PassageRef? parsePassageRef(String passage, Map<String, String> namesByCode) {
+  final p = passage.trim().toLowerCase();
+  String? code;
+  var nameLen = 0;
+  for (final e in namesByCode.entries) {
+    final n = e.value.toLowerCase();
+    if (p.startsWith('$n ') && n.length > nameLen) {
+      code = e.key;
+      nameLen = n.length;
+    }
+  }
+  if (code == null) return null;
+  final m = RegExp(r'^(\d+)(?:[:.](\d+)(?:\s*-\s*(\d+))?)?')
+      .firstMatch(p.substring(nameLen).trim());
+  if (m == null) return null;
+  final v1 = m.group(2) == null ? null : int.parse(m.group(2)!);
+  return PassageRef(
+    BibleRef(code, int.parse(m.group(1)!)),
+    fromVerse: v1,
+    toVerse: m.group(3) == null ? v1 : int.parse(m.group(3)!),
+  );
+}
 
 /// Parse a devotion out of an alkitab.mobi/renungan/sh page. Returns null when
 /// the page doesn't look like a devotion (layout change, error page) — the UI

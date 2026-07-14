@@ -1,4 +1,4 @@
-package com.davidgunawan.teduh
+package com.davidgunawan.koinonia
 
 import io.flutter.embedding.android.FlutterActivity
 

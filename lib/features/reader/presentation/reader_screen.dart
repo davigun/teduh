@@ -14,8 +14,8 @@ import '../../../design/tokens/app_colors.dart';
 import '../../../design/tokens/app_spacing.dart';
 import '../../../design/tokens/app_typography.dart';
 import '../../../design/widgets/reading_size_stepper.dart';
-import '../../../design/widgets/section_card.dart';
 import '../../../design/widgets/segmented_control.dart';
+import 'scripture_blocks.dart';
 
 /// Pembaca — the reading surface. Renders real TSI text: serif on warm paper,
 /// optional superscript verse numbers, section headings, red-letter spans where
@@ -39,7 +39,7 @@ class ReaderScreen extends ConsumerWidget {
     final scale = readingScaleSteps[ref.watch(readingScaleProvider)];
     final showVerses = ref.watch(showVerseNumbersProvider);
 
-    // Closing devotion: only under the LAST chapter of today's plan reading.
+    // Devotion hand-off: only from the LAST chapter of today's plan reading.
     final todays = ref.watch(todaysReadingProvider).value;
     final isTodaysClosing = todays != null &&
         todays.chapters.isNotEmpty &&
@@ -71,13 +71,12 @@ class ReaderScreen extends ConsumerWidget {
       body: chapterAsync.when(
         loading: () => const Center(child: CircularProgressIndicator.adaptive()),
         error: (e, _) => _ReaderError(unavailable: e is ChapterUnavailable),
-        data: (chap) => ListView(
-          padding: const EdgeInsets.fromLTRB(
-              AppSpacing.xxl, AppSpacing.md, AppSpacing.xxl, AppSpacing.x4),
-          children: [
-            ..._buildBlocks(context, chap, scale, showVerses),
-            if (devotion != null) _DevotionCard(devotion: devotion),
-          ],
+        data: (chap) => Scrollbar(
+          child: ListView(
+            padding: const EdgeInsets.fromLTRB(
+                AppSpacing.xxl, AppSpacing.md, AppSpacing.xxl, AppSpacing.x4),
+            children: buildScriptureBlocks(context, chap, scale, showVerses),
+          ),
         ),
       ),
       bottomNavigationBar: _ReaderFooter(
@@ -91,129 +90,18 @@ class ReaderScreen extends ConsumerWidget {
           await markTodayReadAction(ref);
           if (context.mounted) context.go(Routes.home); // mark done + return home
         },
+        // "Baca renungan" also counts as done — the devotion is the gentle
+        // closing, not extra homework.
+        onDevotion: devotion == null
+            ? null
+            : () async {
+                await markTodayReadAction(ref);
+                if (context.mounted) context.push(Routes.devotion);
+              },
       ),
     );
   }
 
-  /// Groups verses into paragraphs split by section headings.
-  List<Widget> _buildBlocks(
-      BuildContext context, Chapter chap, double scale, bool showVerses) {
-    final c = context.colors;
-    final blocks = <Widget>[];
-    var run = <Verse>[];
-
-    void flush() {
-      if (run.isEmpty) return;
-      final children = <InlineSpan>[];
-      for (var i = 0; i < run.length; i++) {
-        if (i > 0) children.add(const TextSpan(text: '\n')); // line break between verses
-        children.addAll(_verseSpans(context, run[i], showVerses));
-      }
-      blocks.add(Padding(
-        padding: const EdgeInsets.only(bottom: AppSpacing.md),
-        child: Text.rich(
-          TextSpan(children: children),
-          style: AppType.scripture
-              .copyWith(color: c.ink, fontSize: AppType.scripture.fontSize! * scale),
-        ),
-      ));
-      run = [];
-    }
-
-    for (final v in chap.verses) {
-      final heading = chap.headingBefore(v.number);
-      if (heading != null) {
-        flush();
-        blocks.add(Padding(
-          padding: const EdgeInsets.only(top: AppSpacing.sm, bottom: AppSpacing.sm),
-          child: Text(heading.text,
-              style: AppType.sectionHead
-                  .copyWith(color: c.ink2, fontSize: AppType.sectionHead.fontSize! * scale)),
-        ));
-      }
-      run.add(v);
-    }
-    flush();
-    return blocks;
-  }
-
-  List<InlineSpan> _verseSpans(BuildContext context, Verse v, bool showVerses) {
-    final c = context.colors;
-    return [
-      if (showVerses)
-        WidgetSpan(
-          alignment: PlaceholderAlignment.top,
-          child: Transform.translate(
-            offset: const Offset(0, 1),
-            child: Padding(
-              padding: const EdgeInsets.only(right: 3, left: 1),
-              child: Text(v.display,
-                  style: AppType.verseNumber.copyWith(color: c.muted)),
-            ),
-          ),
-        ),
-      ..._textSpans(context, v),
-    ];
-  }
-
-  List<InlineSpan> _textSpans(BuildContext context, Verse v) {
-    final wj = v.spans.where((s) => s.kind == SpanKind.wordsOfChrist).toList()
-      ..sort((a, b) => a.start.compareTo(b.start));
-    if (wj.isEmpty) return [TextSpan(text: v.text)];
-
-    final c = context.colors;
-    final out = <InlineSpan>[];
-    var i = 0;
-    for (final s in wj) {
-      final start = s.start.clamp(0, v.text.length);
-      final end = s.end.clamp(0, v.text.length);
-      if (start > i) out.add(TextSpan(text: v.text.substring(i, start)));
-      if (end > start) {
-        out.add(TextSpan(
-            text: v.text.substring(start, end), style: TextStyle(color: c.red)));
-      }
-      i = end;
-    }
-    if (i < v.text.length) out.add(TextSpan(text: v.text.substring(i)));
-    return out;
-  }
-}
-
-/// The gentle closing after today's reading: one Santapan Harian devotion.
-class _DevotionCard extends StatelessWidget {
-  const _DevotionCard({required this.devotion});
-  final Devotion devotion;
-
-  @override
-  Widget build(BuildContext context) {
-    final c = context.colors;
-    return Padding(
-      padding: const EdgeInsets.only(top: AppSpacing.x3),
-      child: SectionCard(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('RENUNGAN · SANTAPAN HARIAN',
-                style: AppType.overline.copyWith(color: c.muted)),
-            const SizedBox(height: AppSpacing.md),
-            Text(devotion.title,
-                style: AppType.title.copyWith(color: c.ink, fontSize: 19)),
-            const SizedBox(height: AppSpacing.xs),
-            Text('Bacaan: ${devotion.passage}',
-                style: AppType.caption.copyWith(color: c.accent)),
-            const SizedBox(height: AppSpacing.lg),
-            Text(devotion.body,
-                style: AppType.body.copyWith(color: c.ink2, height: 1.6)),
-            const SizedBox(height: AppSpacing.lg),
-            Text(
-              '© Scripture Union Indonesia (Yay. Pancar Pijar Alkitab) · via SABDA, alkitab.mobi',
-              style: AppType.caption.copyWith(color: c.muted),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 }
 
 class ReaderSettingsSheet extends ConsumerWidget {
@@ -317,10 +205,18 @@ class _ReaderError extends StatelessWidget {
 
 class _ReaderFooter extends StatelessWidget {
   const _ReaderFooter(
-      {required this.onPrev, required this.onNext, required this.onMarkRead});
+      {required this.onPrev,
+      required this.onNext,
+      required this.onMarkRead,
+      this.onDevotion});
   final VoidCallback? onPrev;
   final VoidCallback? onNext;
   final Future<void> Function() onMarkRead;
+
+  /// Non-null only on the last chapter of today's reading with a devotion
+  /// available: shows the secondary "Baca renungan" hand-off (which also
+  /// marks today done).
+  final Future<void> Function()? onDevotion;
 
   @override
   Widget build(BuildContext context) {
@@ -335,26 +231,49 @@ class _ReaderFooter extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.symmetric(
               horizontal: AppSpacing.lg, vertical: AppSpacing.md),
-          child: Row(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              _RoundChip(icon: Icons.chevron_left, onTap: onPrev),
-              const SizedBox(width: AppSpacing.md),
-              Expanded(
-                child: FilledButton.icon(
-                  onPressed: onMarkRead,
-                  style: FilledButton.styleFrom(
-                    backgroundColor: c.accent,
-                    foregroundColor: c.onAccent,
-                    minimumSize: const Size(0, 50),
-                    shape: const StadiumBorder(),
-                    textStyle: AppType.label.copyWith(fontSize: 15),
+              Row(
+                children: [
+                  _RoundChip(icon: Icons.chevron_left, onTap: onPrev),
+                  const SizedBox(width: AppSpacing.md),
+                  Expanded(
+                    child: FilledButton.icon(
+                      onPressed: onMarkRead,
+                      style: FilledButton.styleFrom(
+                        backgroundColor: c.accent,
+                        foregroundColor: c.onAccent,
+                        minimumSize: const Size(0, 50),
+                        shape: const StadiumBorder(),
+                        textStyle: AppType.label.copyWith(fontSize: 15),
+                      ),
+                      icon: const Icon(Icons.check, size: 18),
+                      label: const Text('Tandai selesai'),
+                    ),
                   ),
-                  icon: const Icon(Icons.check, size: 18),
-                  label: const Text('Tandai selesai'),
-                ),
+                  const SizedBox(width: AppSpacing.md),
+                  _RoundChip(icon: Icons.chevron_right, onTap: onNext),
+                ],
               ),
-              const SizedBox(width: AppSpacing.md),
-              _RoundChip(icon: Icons.chevron_right, onTap: onNext),
+              if (onDevotion != null) ...[
+                const SizedBox(height: AppSpacing.sm),
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    onPressed: onDevotion,
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: c.accent,
+                      side: BorderSide(color: c.accent.withValues(alpha: 0.4)),
+                      minimumSize: const Size(0, 46),
+                      shape: const StadiumBorder(),
+                      textStyle: AppType.label.copyWith(fontSize: 15),
+                    ),
+                    icon: const Icon(Icons.menu_book_outlined, size: 18),
+                    label: const Text('Baca renungan'),
+                  ),
+                ),
+              ],
             ],
           ),
         ),

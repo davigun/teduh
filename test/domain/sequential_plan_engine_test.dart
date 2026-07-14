@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:teduh/core/time/calendar_date.dart';
-import 'package:teduh/domain/entities/bible.dart';
-import 'package:teduh/domain/entities/plan.dart';
-import 'package:teduh/domain/services/sequential_plan_engine.dart';
+import 'package:koinonia/core/time/calendar_date.dart';
+import 'package:koinonia/domain/entities/bible.dart';
+import 'package:koinonia/domain/entities/plan.dart';
+import 'package:koinonia/domain/services/sequential_plan_engine.dart';
 
 void main() {
   const engine = SequentialPlanEngine();

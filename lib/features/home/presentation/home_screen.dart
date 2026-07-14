@@ -32,7 +32,7 @@ class HomeScreen extends ConsumerWidget {
     final firstName = _firstName(ref.watch(authProvider).displayName);
 
     return AdaptiveScaffold.list(
-      title: 'Teduh',
+      title: 'Koinonia',
       padding: const EdgeInsets.fromLTRB(
           AppSpacing.xxl, AppSpacing.xs, AppSpacing.xxl, AppSpacing.x4),
       children: [

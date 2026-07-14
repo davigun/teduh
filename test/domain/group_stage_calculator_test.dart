@@ -2,8 +2,8 @@
 library;
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:teduh/domain/entities/group.dart';
-import 'package:teduh/domain/services/group_stage_calculator.dart';
+import 'package:koinonia/domain/entities/group.dart';
+import 'package:koinonia/domain/services/group_stage_calculator.dart';
 
 void main() {
   const calc = GroupStageCalculator();

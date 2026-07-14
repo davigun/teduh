@@ -2,16 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sqlite3/sqlite3.dart';
-import 'package:teduh/app/day_change_refresher.dart';
-import 'package:teduh/app/providers.dart';
-import 'package:teduh/app/queries.dart';
-import 'package:teduh/core/time/calendar_date.dart';
-import 'package:teduh/core/time/clock.dart';
-import 'package:teduh/data/repositories.dart';
-import 'package:teduh/domain/entities/bible.dart';
-import 'package:teduh/domain/entities/plan.dart';
-import 'package:teduh/domain/entities/progress.dart';
-import 'package:teduh/domain/repositories.dart';
+import 'package:koinonia/app/day_change_refresher.dart';
+import 'package:koinonia/app/providers.dart';
+import 'package:koinonia/app/queries.dart';
+import 'package:koinonia/core/time/calendar_date.dart';
+import 'package:koinonia/core/time/clock.dart';
+import 'package:koinonia/data/repositories.dart';
+import 'package:koinonia/domain/entities/bible.dart';
+import 'package:koinonia/domain/entities/plan.dart';
+import 'package:koinonia/domain/entities/progress.dart';
+import 'package:koinonia/domain/repositories.dart';
 
 /// A clock whose "now" can be advanced to simulate the wall-clock rolling over.
 class _FakeClock extends SystemClock {

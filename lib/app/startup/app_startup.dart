@@ -53,7 +53,7 @@ class _Splash extends StatelessWidget {
       backgroundColor: c.bg,
       body: Center(
         child: Text(
-          'Teduh',
+          'Koinonia',
           style: AppType.display.copyWith(color: c.accent, fontSize: 40),
         ),
       ),

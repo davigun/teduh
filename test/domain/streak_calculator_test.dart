@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:teduh/core/time/calendar_date.dart';
-import 'package:teduh/domain/services/streak_calculator.dart';
+import 'package:koinonia/core/time/calendar_date.dart';
+import 'package:koinonia/domain/services/streak_calculator.dart';
 
 void main() {
   const calc = StreakCalculator();

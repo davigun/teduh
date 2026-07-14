@@ -6,7 +6,7 @@ import '../../design/tokens/app_colors.dart';
 
 /// The persistent 4-tab shell (Beranda / Alkitab / Bersama / Pengaturan).
 /// Native manners: a CupertinoTabBar on iOS, a Material NavigationBar on
-/// Android — both in Teduh's palette. Reader/plan push above this shell.
+/// Android — both in Koinonia's palette. Reader/plan push above this shell.
 class HomeShell extends StatelessWidget {
   const HomeShell({super.key, required this.navigationShell});
 

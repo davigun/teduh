@@ -1,15 +1,15 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:teduh/app/app.dart';
-import 'package:teduh/app/providers.dart';
-import 'package:teduh/app/startup/app_startup.dart';
-import 'package:teduh/core/time/calendar_date.dart';
-import 'package:teduh/data/repositories.dart';
-import 'package:teduh/domain/entities/bible.dart';
-import 'package:teduh/domain/entities/plan.dart';
-import 'package:teduh/domain/entities/progress.dart';
-import 'package:teduh/domain/repositories.dart';
+import 'package:koinonia/app/app.dart';
+import 'package:koinonia/app/providers.dart';
+import 'package:koinonia/app/startup/app_startup.dart';
+import 'package:koinonia/core/time/calendar_date.dart';
+import 'package:koinonia/data/repositories.dart';
+import 'package:koinonia/domain/entities/bible.dart';
+import 'package:koinonia/domain/entities/plan.dart';
+import 'package:koinonia/domain/entities/progress.dart';
+import 'package:koinonia/domain/repositories.dart';
 
 class _FakeBible implements BibleRepository {
   @override
@@ -50,12 +50,12 @@ void main() {
           planRepositoryProvider.overrideWithValue(_FakePlan()),
           progressRepositoryProvider.overrideWithValue(_FakeProgress()),
         ],
-        child: const TeduhApp(),
+        child: const KoinoniaApp(),
       ),
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('Teduh'), findsWidgets);
+    expect(find.text('Koinonia'), findsWidgets);
     // With no plan, the home invites setup.
     expect(find.text('Atur rencana'), findsWidgets);
   });

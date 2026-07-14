@@ -52,6 +52,11 @@ class SupabaseGroupService implements GroupService {
 
   /// The RPCs return a single `public.groups` row (object, or a 1-element list).
   Group _groupFrom(dynamic res, GroupRole role) {
+    if (res == null || (res is List && res.isEmpty)) {
+      // Shouldn't happen (the RPCs raise instead), but a raw StateError here
+      // would bypass the UI's humanized error path.
+      throw StateError('group_not_found');
+    }
     final row = (res is List ? res.first : res) as Map<String, dynamic>;
     return Group(
       id: row['id'] as String,

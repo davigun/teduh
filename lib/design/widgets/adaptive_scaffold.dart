@@ -7,7 +7,7 @@ import '../tokens/app_typography.dart';
 
 /// One chrome, two platforms. Top-level (tab) screens get a collapsing iOS
 /// large-title nav bar (`CupertinoSliverNavigationBar`) on iOS and a Material
-/// `AppBar` on Android. The title keeps Teduh's serif on both — native manners,
+/// `AppBar` on Android. The title keeps Koinonia's serif on both — native manners,
 /// brand intact. Content is supplied as [slivers]; use [AdaptiveScaffold.list]
 /// for a simple padded list of children.
 class AdaptiveScaffold extends StatelessWidget {

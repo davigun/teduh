@@ -49,14 +49,14 @@ class SettingsScreen extends ConsumerWidget {
                           backgroundColor: c.wash,
                           child: Icon(Icons.person_outline, color: c.accent),
                         ),
-                        title: Text(auth.displayName ?? 'Akun Teduh',
+                        title: Text(auth.displayName ?? 'Akun Koinonia',
                             style: AppType.body
                                 .copyWith(color: c.ink, fontSize: 15)),
                         subtitle: Text(
                             auth.email ??
                                 (auth.isAnonymous
                                     ? 'Akun di perangkat ini'
-                                    : 'Akun Teduh'),
+                                    : 'Akun Koinonia'),
                             style: AppType.caption.copyWith(color: c.muted)),
                       ),
                       Divider(height: 1, color: c.hairline),
@@ -203,7 +203,7 @@ class SettingsScreen extends ConsumerWidget {
             child: ListTile(
               contentPadding: const EdgeInsets.symmetric(
                   horizontal: AppSpacing.xl, vertical: AppSpacing.xs),
-              title: Text('Tentang Teduh',
+              title: Text('Tentang Koinonia',
                   style: AppType.body.copyWith(color: c.ink, fontSize: 15)),
               trailing: Icon(Icons.chevron_right, color: c.muted),
               onTap: () => context.push(Routes.about),

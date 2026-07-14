@@ -18,12 +18,20 @@ class SupabaseAuthService implements AuthService {
   SupabaseAuthService(this._client);
   final SupabaseClient _client;
 
+  /// Matches the server's `profiles_display_name_len` check (40 chars).
+  static String _clampName(String name) {
+    final n = name.trim();
+    return n.length > 40 ? n.substring(0, 40) : n;
+  }
+
   static bool _googleInitialized = false;
 
   @override
   Future<void> signInAnonymously({required String name}) async {
     await _client.auth.signInAnonymously();
-    final n = name.trim();
+    // 40 = the server-side profiles_display_name_len cap; clamping here keeps
+    // the profile update from bouncing off the constraint.
+    final n = _clampName(name);
     if (n.isEmpty) return;
     // Set the name on the user (drives AuthSnapshot) and on the profile row
     // (what group-mates see via the mirror).
@@ -51,7 +59,7 @@ class SupabaseAuthService implements AuthService {
         password: password,
         data: {
           if (displayName != null && displayName.trim().isNotEmpty)
-            'display_name': displayName.trim(),
+            'display_name': _clampName(displayName),
         },
       );
 

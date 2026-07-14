@@ -1,6 +1,6 @@
 # Design
 
-The visual system for **Teduh**. Warm, devotional, print-dignified. This file is the single source of truth: the prototype and the Flutter `ThemeData` both derive their tokens from here.
+The visual system for **Koinonia**. Warm, devotional, print-dignified. This file is the single source of truth: the prototype and the Flutter `ThemeData` both derive their tokens from here.
 
 ## Direction
 

@@ -14,11 +14,11 @@ class AboutScreen extends StatelessWidget {
     final c = context.colors;
     return Scaffold(
       backgroundColor: c.bg,
-      appBar: AppBar(title: const Text('Tentang Teduh')),
+      appBar: AppBar(title: const Text('Tentang Koinonia')),
       body: ListView(
         padding: const EdgeInsets.all(AppSpacing.xxl),
         children: [
-          Text('Teduh',
+          Text('Koinonia',
               style: AppType.display.copyWith(color: c.accent, fontSize: 36)),
           const SizedBox(height: AppSpacing.xs),
           Text('Saat teduh, bersama.',
@@ -49,7 +49,7 @@ class AboutScreen extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacing.lg),
           Text(
-            'Karena Perjanjian Lama (AYT) berlisensi non-komersial, Teduh '
+            'Karena Perjanjian Lama (AYT) berlisensi non-komersial, Koinonia '
             'dibagikan secara gratis dan tidak untuk dijual. Perubahan atas teks, '
             'bila ada, dibagikan di bawah lisensi yang sama.',
             style: AppType.caption.copyWith(color: c.muted, height: 1.5),

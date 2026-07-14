@@ -45,7 +45,7 @@ Future<void> main() async {
         sharedPreferencesProvider.overrideWithValue(prefs),
         supabaseClientProvider.overrideWithValue(supabase),
       ],
-      child: const TeduhApp(),
+      child: const KoinoniaApp(),
     ),
   );
 }

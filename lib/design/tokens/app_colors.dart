@@ -7,8 +7,8 @@ import '../theme/reading_theme.dart';
 /// OKLCH tokens in DESIGN.md to exact sRGB (see tool/oklch — kept in the build
 /// notes). All ink/bg and onAccent/accent pairs clear WCAG AA.
 @immutable
-class TeduhColors extends ThemeExtension<TeduhColors> {
-  const TeduhColors({
+class KoinoniaColors extends ThemeExtension<KoinoniaColors> {
+  const KoinoniaColors({
     required this.bg,
     required this.surface,
     required this.sunken,
@@ -38,7 +38,7 @@ class TeduhColors extends ThemeExtension<TeduhColors> {
   final Color red;
   final Color success;
 
-  static const pagi = TeduhColors(
+  static const pagi = KoinoniaColors(
     bg: Color(0xFFF9F4EB),
     surface: Color(0xFFFFFCF6),
     sunken: Color(0xFFF3ECE1),
@@ -54,7 +54,7 @@ class TeduhColors extends ThemeExtension<TeduhColors> {
     success: Color(0xFF4B8B5A),
   );
 
-  static const senja = TeduhColors(
+  static const senja = KoinoniaColors(
     bg: Color(0xFFEDDFCC),
     surface: Color(0xFFF4E7D7),
     sunken: Color(0xFFE6D4C0),
@@ -70,7 +70,7 @@ class TeduhColors extends ThemeExtension<TeduhColors> {
     success: Color(0xFF3F7F4F),
   );
 
-  static const malam = TeduhColors(
+  static const malam = KoinoniaColors(
     bg: Color(0xFF1B1612),
     surface: Color(0xFF251F1A),
     sunken: Color(0xFF14100C),
@@ -86,14 +86,14 @@ class TeduhColors extends ThemeExtension<TeduhColors> {
     success: Color(0xFF6DA97D),
   );
 
-  static TeduhColors of(ReadingTheme theme) => switch (theme) {
+  static KoinoniaColors of(ReadingTheme theme) => switch (theme) {
         ReadingTheme.pagi => pagi,
         ReadingTheme.senja => senja,
         ReadingTheme.malam => malam,
       };
 
   @override
-  TeduhColors copyWith({
+  KoinoniaColors copyWith({
     Color? bg,
     Color? surface,
     Color? sunken,
@@ -108,7 +108,7 @@ class TeduhColors extends ThemeExtension<TeduhColors> {
     Color? red,
     Color? success,
   }) {
-    return TeduhColors(
+    return KoinoniaColors(
       bg: bg ?? this.bg,
       surface: surface ?? this.surface,
       sunken: sunken ?? this.sunken,
@@ -126,9 +126,9 @@ class TeduhColors extends ThemeExtension<TeduhColors> {
   }
 
   @override
-  TeduhColors lerp(ThemeExtension<TeduhColors>? other, double t) {
-    if (other is! TeduhColors) return this;
-    return TeduhColors(
+  KoinoniaColors lerp(ThemeExtension<KoinoniaColors>? other, double t) {
+    if (other is! KoinoniaColors) return this;
+    return KoinoniaColors(
       bg: Color.lerp(bg, other.bg, t)!,
       surface: Color.lerp(surface, other.surface, t)!,
       sunken: Color.lerp(sunken, other.sunken, t)!,
@@ -147,7 +147,7 @@ class TeduhColors extends ThemeExtension<TeduhColors> {
 }
 
 /// Read the palette anywhere: `context.colors.accent`.
-extension TeduhColorsX on BuildContext {
-  TeduhColors get colors =>
-      Theme.of(this).extension<TeduhColors>() ?? TeduhColors.pagi;
+extension KoinoniaColorsX on BuildContext {
+  KoinoniaColors get colors =>
+      Theme.of(this).extension<KoinoniaColors>() ?? KoinoniaColors.pagi;
 }

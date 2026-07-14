@@ -3,9 +3,9 @@ library;
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sqlite3/sqlite3.dart';
-import 'package:teduh/core/errors/app_exception.dart';
-import 'package:teduh/data/repositories.dart';
-import 'package:teduh/domain/entities/bible.dart';
+import 'package:koinonia/core/errors/app_exception.dart';
+import 'package:koinonia/data/repositories.dart';
+import 'package:koinonia/domain/entities/bible.dart';
 
 /// Exercises the real bundled assets/db/bible.db (built from TSI USFX) through
 /// the production repository. Runs on the host VM (system libsqlite3).

@@ -1,6 +1,6 @@
-# Teduh — Flutter Architecture
+# Koinonia — Flutter Architecture
 
-A scalable, offline-first architecture for **Teduh**: an Indonesian Bible reader built around a daily reading rhythm, designed so the deferred "read together" layer (Firebase) drops in later **without a rearchitect**.
+A scalable, offline-first architecture for **Koinonia**: an Indonesian Bible reader built around a daily reading rhythm, designed so the deferred "read together" layer (Firebase) drops in later **without a rearchitect**.
 
 This plan was produced by a 6-stream design pass and an adversarial review; the **Decisions Log** at the end records every contradiction that was reconciled into a single answer.
 
@@ -57,7 +57,7 @@ lib/
   main.dart                      # preload SharedPreferences, build ProviderScope overrides, runApp
   app/                           # COMPOSITION ROOT (may touch every layer)
     bootstrap.dart
-    app.dart                     # TeduhApp: MaterialApp.router, single active ThemeData, locale 'id'
+    app.dart                     # KoinoniaApp: MaterialApp.router, single active ThemeData, locale 'id'
     startup/app_startup.dart     # appStartupProvider (FutureProvider) + AppStartupGate (warm splash)
     router/
       app_router.dart            # goRouterProvider; StatefulShellRoute (4 tabs); reader/plan above shell
@@ -85,7 +85,7 @@ lib/
       sync_service_local.dart    # no-op SyncService (the swap point)
     providers.dart               # appDatabaseProvider, bibleDatabaseProvider (keepAlive infra)
   design/                        # DESIGN SYSTEM (depends on core/l10n only)
-    theme/                       # ReadingTheme enum, TeduhColors ThemeExtension, appThemeFor(mode)
+    theme/                       # ReadingTheme enum, KoinoniaColors ThemeExtension, appThemeFor(mode)
     tokens/                      # colors (OKLCH→const sRGB), typography, spacing, radii, motion
     widgets/                     # PrimaryButton, AppScaffold, EmptyState, ChapterChip,
                                  # StreakRing, CompletionCheck (the mark-read bloom; reused later)
@@ -232,7 +232,7 @@ A pure-Dart CLI that **shares the same drift table definitions**, parses the TSI
 
 > **Redirect rule (fix):** only the **Beranda (Home)** tab requires an active plan; Library and Reader are always reachable (free reading is a first-class path — `reading_progress.plan_id` is nullable). First-run onboarding is driven by a `onboardingCompleted` pref flag, **not** by "no plan," so reading is never walled. `hasActivePlanProvider` is a keepAlive **sync** provider seeded during the startup gate; the router is built only after `appStartupProvider` resolves.
 
-**Theming:** three precomputed `ThemeData` selected by `appThemeFor(mode)` — **do not** use `darkTheme`/`themeMode` (that only toggles two). Pagi + Senja are `Brightness.light`; Malam is `Brightness.dark`. Colors are a `TeduhColors` `ThemeExtension` (with `lerp` for a smooth cross-fade). **OKLCH → const `Color(0xFF…)` is precomputed at build time** by a small script into a contrast-verified table (Flutter `Color` is sRGB; runtime OKLCH math is wasted). Typography is a color-agnostic static class; the reading-size step is applied **locally in the Reader** so resizing scripture doesn't rebuild app-wide `ThemeData`.
+**Theming:** three precomputed `ThemeData` selected by `appThemeFor(mode)` — **do not** use `darkTheme`/`themeMode` (that only toggles two). Pagi + Senja are `Brightness.light`; Malam is `Brightness.dark`. Colors are a `KoinoniaColors` `ThemeExtension` (with `lerp` for a smooth cross-fade). **OKLCH → const `Color(0xFF…)` is precomputed at build time** by a small script into a contrast-verified table (Flutter `Color` is sRGB; runtime OKLCH math is wasted). Typography is a color-agnostic static class; the reading-size step is applied **locally in the Reader** so resizing scripture doesn't rebuild app-wide `ThemeData`.
 
 **Scripture rendering:** each paragraph is a `Text.rich` inside a `ListView.builder` (lazy, reflows as prose, gives scroll anchors). Superscript verse numbers use **`WidgetSpan`** (not font `sups`, which is unreliable in these fonts); red-letter uses a colored `TextSpan` derived from the verse `spans`; wrap the subtree in `RepaintBoundary`; a golden test at scale 1.3 with a long chapter (e.g. Ps 119) guards baseline drift.
 
@@ -333,7 +333,7 @@ Pin Flutter with **FVM** for reproducible solo-dev/CI builds.
 | 8 | **Red-letter + poetry + footnotes = char-offset `spans` JSON** | sub-verse words-of-Christ can't be a per-verse boolean |
 | 9 | **`design/` is a real top-level layer** | single home for DESIGN.md tokens, no cross-layer coupling |
 | 10 | **Install to `applicationSupport`, read-only, background isolate, migrations neutralized** | no iCloud bloat, no UI jank, no crash writing to a `query_only` handle |
-| 11 | **Three explicit `ThemeData` via `appThemeFor`** (not `themeMode`) | Material's `themeMode` only toggles two; Teduh has three |
+| 11 | **Three explicit `ThemeData` via `appThemeFor`** (not `themeMode`) | Material's `themeMode` only toggles two; Koinonia has three |
 | 12 | **Startup gate owns DB install/open; `main()` only preloads prefs** | the multi-MB copy never blocks the first frame |
 | 13 | **One `Clock` (`nowLocal` + `nowUtc`)** | calendar math local, instants UTC; no off-by-one near midnight |
 | 14 | **Riverpod 3 + generic `Ref` + native `riverpod_lint`** | current idiom; the 3.x/4.x version skew is intentional |

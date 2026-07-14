@@ -25,7 +25,7 @@ class OnboardingScreen extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Spacer(flex: 2),
-              Text('Teduh',
+              Text('Koinonia',
                   style: AppType.display.copyWith(color: c.accent, fontSize: 48)),
               const SizedBox(height: AppSpacing.sm),
               Text('Saat teduh, setiap hari.',
@@ -40,7 +40,7 @@ class OnboardingScreen extends ConsumerWidget {
               _Point(
                 icon: Icons.route_outlined,
                 title: 'Langkah yang pas',
-                body: 'Tentukan beberapa pasal sehari; Teduh menjaga jadwalmu.',
+                body: 'Tentukan beberapa pasal sehari; Koinonia menjaga jadwalmu.',
               ),
               const SizedBox(height: AppSpacing.lg),
               _Point(

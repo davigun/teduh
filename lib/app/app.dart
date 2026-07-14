@@ -7,8 +7,8 @@ import 'router/app_router.dart';
 import 'startup/app_startup.dart';
 import 'theme_controller.dart';
 
-class TeduhApp extends ConsumerWidget {
-  const TeduhApp({super.key});
+class KoinoniaApp extends ConsumerWidget {
+  const KoinoniaApp({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -16,7 +16,7 @@ class TeduhApp extends ConsumerWidget {
     final router = ref.watch(goRouterProvider);
 
     return MaterialApp.router(
-      title: 'Teduh',
+      title: 'Koinonia',
       debugShowCheckedModeBanner: false,
       theme: appThemeFor(theme),
       routerConfig: router,

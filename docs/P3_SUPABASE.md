@@ -1,8 +1,8 @@
 # P3 — "Read Together" on Supabase
 
-How Teduh adds accounts + a shared group reading rhythm, replacing the originally-planned Firebase layer with **Supabase** (managed Postgres + Auth + Realtime). Produced from a 5-stream design pass + adversarial review; the **Decisions Log** records every contradiction reconciled into one answer.
+How Koinonia adds accounts + a shared group reading rhythm, replacing the originally-planned Firebase layer with **Supabase** (managed Postgres + Auth + Realtime). Produced from a 5-stream design pass + adversarial review; the **Decisions Log** records every contradiction reconciled into one answer.
 
-**Non-negotiable invariant:** reading stays 100% offline with no account. Supabase only *adds* the social layer, dropped into the existing `SyncService` seam (`ARCHITECTURE.md` §7) with an **additive** sqlite migration — no rearchitect. (Note: bundling AYT already made Teduh non-commercial; Supabase's free tier is fine.)
+**Non-negotiable invariant:** reading stays 100% offline with no account. Supabase only *adds* the social layer, dropped into the existing `SyncService` seam (`ARCHITECTURE.md` §7) with an **additive** sqlite migration — no rearchitect. (Note: bundling AYT already made Koinonia non-commercial; Supabase's free tier is fine.)
 
 ---
 

@@ -77,7 +77,7 @@ class ParsedVerse {
 
 /// Usage: `dart run tool/build_bible_db.dart <nt.usfx> [ot.usfx] [out.db]`
 /// Books are taken per-testament from the matching source. With one input,
-/// both testaments come from it. Teduh's canonical build:
+/// both testaments come from it. Koinonia's canonical build:
 ///   dart run tool/build_bible_db.dart ind_usfx.xml indayt_usfx.xml assets/db/bible.db
 /// (NT = TSI, OT = AYT.)
 void main(List<String> args) {

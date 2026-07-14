@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:teduh/domain/entities/bible.dart';
-import 'package:teduh/features/plan/presentation/start_picker.dart';
+import 'package:koinonia/domain/entities/bible.dart';
+import 'package:koinonia/features/plan/presentation/start_picker.dart';
 
 void main() {
   const books = [

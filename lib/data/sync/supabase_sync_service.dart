@@ -50,10 +50,13 @@ class SupabaseSyncService implements SyncService {
     final uid = _uid;
     if (uid == null) return;
 
+    // Scoped to the current uid: a previous account's unsynced rows on a shared
+    // device must never be uploaded (stamped) as this account's.
     final rows = _app.select(
       'SELECT id, plan_id, day_index, group_id, book_code, chapter, local_date, '
       'completed_at, updated_at FROM reading_progress '
-      'WHERE dirty = 1 AND plan_id IS NOT NULL AND user_id IS NOT NULL',
+      'WHERE dirty = 1 AND plan_id IS NOT NULL AND user_id = ?',
+      [uid],
     );
     if (rows.isEmpty) return;
 

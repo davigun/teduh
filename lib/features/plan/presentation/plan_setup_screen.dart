@@ -48,7 +48,7 @@ class _PlanSetupScreenState extends ConsumerState<PlanSetupScreen> {
               style: AppType.title.copyWith(color: c.ink, fontSize: 22, height: 1.3)),
           const SizedBox(height: AppSpacing.sm),
           Text(
-            'Tentukan berapa pasal sehari. Teduh menyusun jadwalnya, kamu tinggal membaca.',
+            'Tentukan berapa pasal sehari. Koinonia menyusun jadwalnya, kamu tinggal membaca.',
             style: AppType.body.copyWith(color: c.ink2, height: 1.5),
           ),
           const SizedBox(height: AppSpacing.xl),

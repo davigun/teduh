@@ -7,7 +7,7 @@ import 'reading_theme.dart';
 /// Builds the [ThemeData] for one [ReadingTheme]. The app selects this
 /// explicitly per value (no `themeMode`) because there are three temperatures.
 ThemeData appThemeFor(ReadingTheme theme) {
-  final c = TeduhColors.of(theme);
+  final c = KoinoniaColors.of(theme);
   final base = ThemeData(brightness: theme.brightness, useMaterial3: true);
 
   final colorScheme = ColorScheme.fromSeed(
